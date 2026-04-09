@@ -1,43 +1,39 @@
 import express from 'express';
 const app = express();
-
-// 解析 JSON
 app.use(express.json());
 
-// 测试接口（本地一定能访问）
+// 本地/线上通用数据库逻辑
+let DB: any;
+const isCloudflare = typeof (globalThis as any).DB !== 'undefined';
+
+if (isCloudflare) {
+	DB = (globalThis as any).DB;
+} else {
+	const sqlite3 = require('sqlite3').verbose();
+	DB = new sqlite3.Database('./local.db');
+}
+
+// 测试接口
 app.get('/', (req, res) => {
 	res.send('✅ Express 运行成功！');
 });
 
-// API 列表
+// 列表接口
 app.get('/api/items', async (req, res) => {
 	try {
-		// @ts-ignore
-		const { results } = await DB.prepare(`SELECT * FROM items`).all();
-		res.json(results);
-	} catch (err) {
+		if (isCloudflare) {
+			const { results } = await DB.prepare('SELECT * FROM items').all();
+			res.json(results);
+		} else {
+			DB.all('SELECT * FROM items', [], (err, rows) => {
+				if (err) return res.status(500).json({ error: err.message });
+				res.json(rows);
+			});
+		}
+	} catch (e) {
 		res.status(500).json({ error: '数据库错误' });
 	}
 });
 
-// 新增
-app.post('/api/items', async (req, res) => {
-	const { title } = req.body;
-	if (!title) return res.status(400).json({ error: 'title 不能为空' });
-
-	try {
-		// @ts-ignore
-		await DB.prepare(`INSERT INTO items (title) VALUES (?)`).bind(title).run();
-		res.json({ success: true });
-	} catch (err) {
-		res.status(500).json({ error: '保存失败' });
-	}
-});
-
-// 本地启动
-const PORT = 3000;
-app.listen(PORT, () => {
-	console.log(`✅ 本地服务已启动：http://localhost:${PORT}`);
-});
-
+// 👇 只保留这一段导出，不要 app.listen！
 export default app;
