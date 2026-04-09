@@ -1,5 +1,5 @@
 import { TodoDatabase } from '../db/database';
-import type { Todo } from '../types/todo';
+import type { Todo } from '../db/schema';
 import type { Bindings } from '../types/index';
 
 export class TodoService {
