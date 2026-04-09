@@ -2,6 +2,7 @@
 name = "cf-express-d1"
 main = "dist/server.js"
 compatibility_date = "2024-02-01"
+compatibility_flags = [ "nodejs_compat" ]
 
 [[d1_databases]]
 binding = "DB"
