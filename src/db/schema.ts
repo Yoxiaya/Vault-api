@@ -9,16 +9,16 @@ export const todos = sqliteTable('todos', {
 
 export const accounts = sqliteTable('accounts', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
-	appName: text('app_name').notNull(),
+	appName: text('appName').notNull(),
 	username: text('username').notNull(),
 	password: text('password').notNull(),
 	email: text('email'),
-	webSite: text('web_site'),
+	webSite: text('webSite'),
 	category: text('category'),
-	logoUrl: text('logo_url'),
-	lastUpdated: text('last_updated'),
-	twoFactorEnabled: integer('two_factor_enabled', { mode: 'boolean' }).default(false),
-	storageType: text('storage_type'),
+	logoUrl: text('logoUrl'),
+	lastUpdated: text('lastUpdated'),
+	twoFactorEnabled: integer('twoFactorEnabled', { mode: 'boolean' }).default(false),
+	storageType: text('storageType'),
 });
 
 // 导出类型

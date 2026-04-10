@@ -15,4 +15,12 @@ export class VaultAccountsService {
 	async createAccount(account: Account): Promise<void> {
 		await this.db.create(account);
 	}
+	// 更新账户
+	async updateAccount(id: number, account: Account): Promise<void> {
+		await this.db.update(id, account);
+	}
+	// 删除账户
+	async deleteAccount(id: number): Promise<void> {
+		await this.db.delete(id);
+	}
 }

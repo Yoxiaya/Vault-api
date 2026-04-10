@@ -34,6 +34,8 @@ app.delete('/todos/:id', (c) => todoController.deleteTodo(c));
 
 app.get('/vault-accounts', (c) => vaultAccountsController.getAllAccounts(c));
 app.post('/vault-accounts', (c) => vaultAccountsController.createAccount(c));
+app.put('/vault-accounts/:id', (c) => vaultAccountsController.updateAccount(c));
+app.delete('/vault-accounts/:id', (c) => vaultAccountsController.deleteAccount(c));
 
 // 健康检查
 app.get('/', (c) => c.json({ status: 'ok', message: 'Todo API is running' }));
