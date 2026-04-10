@@ -17,7 +17,7 @@ export class TodoDatabase {
 	// 创建待办事项
 	async create(input: CreateTodoInput): Promise<void> {
 		const drizzleDb = drizzle(this.todo_db);
-		console.log(input);
+
 		await drizzleDb.insert(todos).values(input).run();
 	}
 

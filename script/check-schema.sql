@@ -7,8 +7,8 @@ ORDER BY name;
 
 -- 查看 todos 表结构（如果存在）
 SELECT '=== Todos Table Structure ===' as "";
-SELECT * FROM pragma_table_info('todos');
+SELECT * FROM pragma_table_info('accounts');
 
--- 查看 todos 表数据量
-SELECT '=== Todos Table Data Count ===' as "";
-SELECT COUNT(*) as total_rows FROM todos;
+-- -- 查看 todos 表数据量
+-- SELECT '=== Todos Table Data Count ===' as "";
+-- SELECT COUNT(*) as total_rows FROM todo;
