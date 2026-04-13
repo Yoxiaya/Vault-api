@@ -1,7 +1,6 @@
 import { Context } from 'hono';
 import { VaultAccountsService } from '../services/vault-accounts.service';
 import { Bindings } from '../types';
-import { Account, NewAccount } from '../db/schema';
 
 export class VaultAccountsController {
 	private service: VaultAccountsService;
@@ -52,6 +51,25 @@ export class VaultAccountsController {
 			return c.json({ success: true, message: '删除成功' }, 200);
 		} catch (error) {
 			console.error('删除账户失败:', error);
+			return c.json({ error: '服务器内部错误' }, 500);
+		}
+	}
+	// 上传应用图标到ImgBB
+	async uploadImageToImgbb(c: Context) {
+		try {
+			// const data = await c.req.parseBody();
+			// const image = data['image'] as File;
+
+			// const formData = new FormData();
+			// formData.append('token', '3ce018fd6d56468ca568de8e37b6113d');
+			// formData.append('file', image);
+
+			const a = await c.req.raw.formData();
+			console.log(a);
+			const url = await this.service.uploadImageToImgbb(a);
+			return c.json({ success: true, data: { url } });
+		} catch (error) {
+			console.error('上传图片失败:', error);
 			return c.json({ error: '服务器内部错误' }, 500);
 		}
 	}

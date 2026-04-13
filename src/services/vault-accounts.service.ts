@@ -1,6 +1,7 @@
 import { VaultAccountsDatabase } from '../db/vault-accounts';
 import { Account } from '../db/schema';
 import { Bindings } from '../types';
+import axios from 'axios';
 
 export class VaultAccountsService {
 	private db: VaultAccountsDatabase;
@@ -22,5 +23,17 @@ export class VaultAccountsService {
 	// 删除账户
 	async deleteAccount(id: number): Promise<void> {
 		await this.db.delete(id);
+	}
+	// 上传图片
+	async uploadImageToImgbb(data: FormData): Promise<any> {
+		console.log('上传图片数据:', data);
+
+		const result = await axios({
+			method: 'post',
+			url: 'https://api.superbed.cn/upload',
+			data,
+		});
+		console.log('上传图片result:', result);
+		return result.data;
 	}
 }
