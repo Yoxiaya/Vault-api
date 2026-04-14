@@ -57,16 +57,14 @@ export class VaultAccountsController {
 	// 上传应用图标到ImgBB
 	async uploadImageToImgbb(c: Context) {
 		try {
-			// const data = await c.req.parseBody();
-			// const image = data['image'] as File;
+			const data = await c.req.parseBody();
+			const image = data['file'] as File;
 
-			// const formData = new FormData();
-			// formData.append('token', '3ce018fd6d56468ca568de8e37b6113d');
-			// formData.append('file', image);
+			const formData = new FormData();
+			formData.append('file', image);
+			formData.append('token', '3ce018fd6d56468ca568de8e37b6113d');
 
-			const a = await c.req.raw.formData();
-			console.log(a);
-			const url = await this.service.uploadImageToImgbb(a);
+			const url = await this.service.uploadImageToImgbb(formData);
 			return c.json({ success: true, data: { url } });
 		} catch (error) {
 			console.error('上传图片失败:', error);

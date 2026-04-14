@@ -26,14 +26,11 @@ export class VaultAccountsService {
 	}
 	// 上传图片
 	async uploadImageToImgbb(data: FormData): Promise<any> {
-		console.log('上传图片数据:', data);
-
 		const result = await axios({
 			method: 'post',
 			url: 'https://api.superbed.cn/upload',
 			data,
 		});
-		console.log('上传图片result:', result);
 		return result.data;
 	}
 }
