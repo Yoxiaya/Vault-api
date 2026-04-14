@@ -1,5 +1,6 @@
 import { Context } from 'hono';
 import { VaultAccountsService } from '../services/vault-accounts.service';
+import { IMAGE_API_TOKEN } from '../config/index';
 import { Bindings } from '../types';
 
 export class VaultAccountsController {
@@ -61,20 +62,29 @@ export class VaultAccountsController {
 			const image = data['file'] as File;
 
 			const formData = new FormData();
-			// formData.append('file', image);
-			formData.append('token', '3ce018fd6d56468ca568de8e37b6113d');
-			console.log('uploadImage========>>>', formData);
+			formData.append('file', image);
+			formData.append('token', IMAGE_API_TOKEN);
 
 			const url = await this.service.uploadImage(formData);
-			return c.json({ success: true, data: { url } });
+			return c.json({ success: true, data: url });
 		} catch (error) {
 			console.error('上传图片失败:', error);
 			return c.json({ error: '服务器内部错误' }, 500);
 		}
 	}
-	async formTest(c: Context) {
-		const data = await c.req.parseBody();
-		console.log('formTest========>>>', data);
-		return c.json({ success: true, data: data });
+	// 删除图片
+	async deleteImage(c: Context) {
+		try {
+			const data = await c.req.parseBody();
+			const url = data['url'] as string;
+			const formData = new FormData();
+			formData.append('urls', url);
+			formData.append('token', IMAGE_API_TOKEN);
+			await this.service.deleteImage(formData);
+			return c.json({ success: true, message: '删除成功' }, 200);
+		} catch (error) {
+			console.error('删除图片失败:', error);
+			return c.json({ error: '服务器内部错误' }, 500);
+		}
 	}
 }

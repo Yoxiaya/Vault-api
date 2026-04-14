@@ -1,7 +1,7 @@
 import { VaultAccountsDatabase } from '../db/vault-accounts';
 import { Account } from '../db/schema';
+import { IMAGE_API_URL } from '../config/index';
 import { Bindings } from '../types';
-import axios from 'axios';
 
 export class VaultAccountsService {
 	private db: VaultAccountsDatabase;
@@ -26,12 +26,18 @@ export class VaultAccountsService {
 	}
 	// 上传图片
 	async uploadImage(data: FormData): Promise<any> {
-		const result = await axios({
-			method: 'post',
-			// url: 'https://api.superbed.cn/upload',
-			url: 'http://127.0.0.1:8787/vault-accounts/form',
-			data,
+		const result = await fetch(`${IMAGE_API_URL}/upload`, {
+			method: 'POST',
+			body: data,
 		});
-		return result.data;
+		return result.json();
+	}
+	// 删除图片
+	async deleteImage(data: FormData): Promise<void> {
+		const result = await fetch(`${IMAGE_API_URL}/delete`, {
+			method: 'POST',
+			body: data,
+		});
+		return result.json();
 	}
 }
