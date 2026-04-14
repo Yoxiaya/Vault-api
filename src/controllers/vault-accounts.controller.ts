@@ -54,21 +54,27 @@ export class VaultAccountsController {
 			return c.json({ error: '服务器内部错误' }, 500);
 		}
 	}
-	// 上传应用图标到ImgBB
-	async uploadImageToImgbb(c: Context) {
+	// 上传应用图标
+	async uploadImage(c: Context) {
 		try {
 			const data = await c.req.parseBody();
 			const image = data['file'] as File;
 
 			const formData = new FormData();
-			formData.append('file', image);
+			// formData.append('file', image);
 			formData.append('token', '3ce018fd6d56468ca568de8e37b6113d');
+			console.log('uploadImage========>>>', formData);
 
-			const url = await this.service.uploadImageToImgbb(formData);
+			const url = await this.service.uploadImage(formData);
 			return c.json({ success: true, data: { url } });
 		} catch (error) {
 			console.error('上传图片失败:', error);
 			return c.json({ error: '服务器内部错误' }, 500);
 		}
+	}
+	async formTest(c: Context) {
+		const data = await c.req.parseBody();
+		console.log('formTest========>>>', data);
+		return c.json({ success: true, data: data });
 	}
 }

@@ -25,10 +25,11 @@ export class VaultAccountsService {
 		await this.db.delete(id);
 	}
 	// 上传图片
-	async uploadImageToImgbb(data: FormData): Promise<any> {
+	async uploadImage(data: FormData): Promise<any> {
 		const result = await axios({
 			method: 'post',
-			url: 'https://api.superbed.cn/upload',
+			// url: 'https://api.superbed.cn/upload',
+			url: 'http://127.0.0.1:8787/vault-accounts/form',
 			data,
 		});
 		return result.data;

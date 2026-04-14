@@ -11,6 +11,7 @@
         <button id="uploadBtn">上传图片1</button>
         <button id="uploadBtn2">上传图片2</button>
         <button id="testBtn">测试</button>
+        <button id="formTest">测试form</button>
 </body>
 <script>
     const uploadBtn = document.getElementById('uploadBtn');
@@ -22,9 +23,6 @@
             alert('请选择图片');
             return;
         }
-        
-
-
         const formData = new FormData();
         formData.append('token', '3ce018fd6d56468ca568de8e37b6113d');
         formData.append('file', file);
@@ -62,6 +60,22 @@
         const file = image.files?.[0];
         console.log(file);
     });
+    formTest.addEventListener("click",()=>{
+        const formData = new FormData();
+        formData.append('name', 'test');
+        formData.append('age', '18');
+        const data = {
+            name: 'test',
+            age: '18',
+        }
+        console.log(formData);
+        
+        axios.post('http://127.0.0.1:8787/vault-accounts/form', formData)
+            .then(response => {
+                console.log(response.data);
+            })
+       
+    })
 
    
 </script>
