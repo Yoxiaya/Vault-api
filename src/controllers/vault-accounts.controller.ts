@@ -60,12 +60,7 @@ export class VaultAccountsController {
 		try {
 			const data = await c.req.parseBody();
 			const image = data['file'] as File;
-
-			const formData = new FormData();
-			formData.append('file', image);
-			formData.append('token', IMAGE_API_TOKEN);
-
-			const url = await this.service.uploadImage(formData);
+			const url = await this.service.uploadImage(image);
 			return c.json({ success: true, data: url });
 		} catch (error) {
 			console.error('上传图片失败:', error);
@@ -77,10 +72,7 @@ export class VaultAccountsController {
 		try {
 			const data = await c.req.parseBody();
 			const url = data['url'] as string;
-			const formData = new FormData();
-			formData.append('urls', url);
-			formData.append('token', IMAGE_API_TOKEN);
-			await this.service.deleteImage(formData);
+			await this.service.deleteImage(url);
 			return c.json({ success: true, message: '删除成功' }, 200);
 		} catch (error) {
 			console.error('删除图片失败:', error);

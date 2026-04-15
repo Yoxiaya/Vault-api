@@ -1,6 +1,6 @@
 import { VaultAccountsDatabase } from '../db/vault-accounts';
 import { Account } from '../db/schema';
-import { IMAGE_API_URL } from '../config/index';
+import { IMAGE_API_URL, IMAGE_API_TOKEN } from '../config/index';
 import { Bindings } from '../types';
 
 export class VaultAccountsService {
@@ -25,18 +25,24 @@ export class VaultAccountsService {
 		await this.db.delete(id);
 	}
 	// 上传图片
-	async uploadImage(data: FormData): Promise<any> {
+	async uploadImage(image: File): Promise<any> {
+		const formData = new FormData();
+		formData.append('file', image);
+		formData.append('token', IMAGE_API_TOKEN);
 		const result = await fetch(`${IMAGE_API_URL}/upload`, {
 			method: 'POST',
-			body: data,
+			body: formData,
 		});
 		return result.json();
 	}
 	// 删除图片
-	async deleteImage(data: FormData): Promise<void> {
+	async deleteImage(url: string): Promise<void> {
+		const formData = new FormData();
+		formData.append('urls', url);
+		formData.append('token', IMAGE_API_TOKEN);
 		const result = await fetch(`${IMAGE_API_URL}/delete`, {
 			method: 'POST',
-			body: data,
+			body: formData,
 		});
 		return result.json();
 	}
