@@ -9,5 +9,6 @@ CREATE TABLE IF NOT EXISTS accounts (
 	logoUrl TEXT,
 	lastUpdated TEXT,
 	twoFactorEnabled INTEGER DEFAULT 0,
-	storageType TEXT
+	storageType TEXT,
+	description TEXT
 );

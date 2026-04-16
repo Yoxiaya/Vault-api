@@ -19,6 +19,7 @@ export const accounts = sqliteTable('accounts', {
 	lastUpdated: text('lastUpdated'),
 	twoFactorEnabled: integer('twoFactorEnabled', { mode: 'boolean' }).default(false),
 	storageType: text('storageType'),
+	description: text('description').default(''),
 });
 
 // 导出类型
