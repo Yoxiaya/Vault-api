@@ -26,4 +26,10 @@ export class VaultAccountsDatabase {
 		const drizzleDb = drizzle(this.vault_db);
 		await drizzleDb.delete(accounts).where(eq(accounts.id, id)).run();
 	}
+	async findById(id: number): Promise<Account | null> {
+		const drizzleDb = drizzle(this.vault_db);
+		const result = await drizzleDb.select().from(accounts).where(eq(accounts.id, id)).run();
+		const account = result.results[0];
+		return account;
+	}
 }

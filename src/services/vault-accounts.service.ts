@@ -24,6 +24,10 @@ export class VaultAccountsService {
 	async deleteAccount(id: number): Promise<void> {
 		await this.db.delete(id);
 	}
+	// 根据ID获取账户
+	async findById(id: number): Promise<Account | null> {
+		return this.db.findById(id);
+	}
 	// 上传图片
 	async uploadImage(image: File): Promise<any> {
 		const formData = new FormData();

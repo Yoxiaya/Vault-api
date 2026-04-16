@@ -17,5 +17,6 @@ vaultAccountsRoutes.get('/', (c) => vaultAccountsController.getAllAccounts(c));
 vaultAccountsRoutes.post('/', (c) => vaultAccountsController.createAccount(c));
 vaultAccountsRoutes.put('/:id', (c) => vaultAccountsController.updateAccount(c));
 vaultAccountsRoutes.delete('/:id', (c) => vaultAccountsController.deleteAccount(c));
+vaultAccountsRoutes.get('/:id', (c) => vaultAccountsController.findById(c));
 vaultAccountsRoutes.post('/upload-image', (c) => vaultAccountsController.uploadImage(c));
 vaultAccountsRoutes.post('/delete-image', (c) => vaultAccountsController.deleteImage(c));
