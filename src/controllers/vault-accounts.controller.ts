@@ -1,6 +1,5 @@
 import { Context } from 'hono';
 import { VaultAccountsService } from '../services/vault-accounts.service';
-import { IMAGE_API_TOKEN } from '../config/index';
 import { Bindings } from '../types';
 
 export class VaultAccountsController {
@@ -43,11 +42,29 @@ export class VaultAccountsController {
 			return c.json({ error: '服务器内部错误' }, 500);
 		}
 	}
+	// 根据ID获取账户
+	async findById(c: Context) {
+		try {
+			const id = parseInt(c.req.param('id') || '');
+			const account = await this.service.findById(id);
+			if (account) {
+				return c.json({ success: true, data: account });
+			} else {
+				return c.json({ success: false, message: '账户不存在' }, 404);
+			}
+		} catch (error) {
+			console.error('根据账户ID获取账户失败:', error);
+			return c.json({ error: '服务器内部错误' }, 500);
+		}
+	}
 	// 删除账户
 	async deleteAccount(c: Context) {
 		try {
 			const id = parseInt(c.req.param('id') || '');
-
+			const account = await this.service.findById(id);
+			if (account && account.logoUrl) {
+				await this.service.deleteImage(account.logoUrl);
+			}
 			await this.service.deleteAccount(id);
 			return c.json({ success: true, message: '删除成功' }, 200);
 		} catch (error) {
