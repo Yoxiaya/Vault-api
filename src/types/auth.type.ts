@@ -4,6 +4,6 @@ export type RegisterUser = {
 	email: string;
 };
 export type LoginInfo = {
-	email: string;
+	account: string;
 	password: string;
 };

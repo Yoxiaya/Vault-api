@@ -11,3 +11,4 @@ authRoutes.use('*', async (c, next) => {
 	await next();
 });
 authRoutes.post('/register', (c) => c.get('authController')!.register(c));
+authRoutes.post('/login', (c) => c.get('authController')!.login(c));

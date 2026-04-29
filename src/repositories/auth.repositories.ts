@@ -1,6 +1,6 @@
 import { Bindings, LoginInfo, RegisterUser } from '../types/index';
 import { drizzle } from 'drizzle-orm/d1';
-import { users, type User } from '../db/schema';
+import { users, sessions, type User } from '../db/schema';
 import { eq, or } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 
@@ -18,7 +18,7 @@ export class AuthRepository {
 			throw new Error('用户名或邮箱已存在');
 		}
 		const passwordHash = await bcrypt.hash(user.password, 10);
-		const result = await drizzleDb.insert(users).values({
+		await drizzleDb.insert(users).values({
 			username: user.username,
 			passwordHash: passwordHash,
 			email: user.email,
@@ -26,13 +26,32 @@ export class AuthRepository {
 	}
 	async login(loginInfo: LoginInfo) {
 		const drizzleDb = drizzle(this.vault_db);
-		const user = await drizzleDb.select().from(users).where(eq(users.email, loginInfo.email)).run();
-		if (user.results.length === 0) {
+
+		const isEmail = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/.test(loginInfo.account);
+		let user;
+		if (isEmail) {
+			user = await drizzleDb.select().from(users).where(eq(users.email, loginInfo.account)).get();
+		} else {
+			user = await drizzleDb.select().from(users).where(eq(users.username, loginInfo.account)).get();
+		}
+		if (!user) {
 			throw new Error('用户不存在');
 		}
-		const isMatch = await bcrypt.compare(loginInfo.password, user.results[0].passwordHash);
+		const isMatch = await bcrypt.compare(loginInfo.password, user.passwordHash);
 		if (!isMatch) {
-			throw new Error('密码错误');
+			throw new Error('账号或密码错误');
 		}
+		const token = crypto.randomUUID();
+		const expiresAt = new Date();
+		expiresAt.setDate(expiresAt.getDate() + 7);
+		await drizzleDb.insert(sessions).values({
+			user_id: user.id,
+			token,
+			expires_at: new Date(expiresAt),
+		});
+		return {
+			token,
+			user: { id: user.id, username: user.username, email: user.email },
+		};
 	}
 }

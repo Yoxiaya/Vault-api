@@ -132,6 +132,12 @@ npx wrangler d1 execute 数据库名称 --local --command "SQL 语句"
 npx wrangler d1 execute 数据库名称 --local --file "SQL 脚本路径"
 ```
 
+> 查看本地数据库表结构
+
+```bash
+npx wrangler d1 execute vault_db --local --file "script/check-schema.sql"
+```
+
 ### 部署到 Cloudflare
 
 ```bash

@@ -15,6 +15,7 @@ export type Variables = {
 
 export type AuthController = {
 	register: (c: any) => Promise<any>;
+	login: (c: any) => Promise<any>;
 };
 
 export type TodoController = {

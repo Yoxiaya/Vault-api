@@ -5,10 +5,13 @@ SELECT name FROM sqlite_master
 WHERE type='table' AND name NOT LIKE 'sqlite_%' 
 ORDER BY name;
 
--- 查看 todos 表结构（如果存在）
-SELECT '=== Todos Table Structure ===' as "";
-SELECT * FROM pragma_table_info('accounts');
+-- 查看表结构（如果存在）
+SELECT '===  Table Structure ===' as "";
+SELECT * FROM pragma_table_info('users');
 
--- -- 查看 todos 表数据量
--- SELECT '=== Todos Table Data Count ===' as "";
--- SELECT COUNT(*) as total_rows FROM todo;
+-- 查看表数据量
+SELECT '=== Table Data Count ===' as "";
+SELECT COUNT(*) as total_rows FROM users;
+-- 查看表数据
+SELECT '=== Table Data ===' as "";
+SELECT * FROM users;
