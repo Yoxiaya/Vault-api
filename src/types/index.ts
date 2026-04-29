@@ -5,3 +5,25 @@ export type Bindings = {
 	DATABASE_URL: string;
 	API_KEY: string;
 };
+
+export type Variables = {
+	todoController?: TodoController;
+	vaultAccountsController?: VaultAccountsController;
+};
+
+export type TodoController = {
+	getAllTodos: (c: any) => Promise<any>;
+	createTodo: (c: any) => Promise<any>;
+	toggleComplete: (c: any) => Promise<any>;
+	deleteTodo: (c: any) => Promise<any>;
+};
+
+export type VaultAccountsController = {
+	getAllAccounts: (c: any) => Promise<any>;
+	createAccount: (c: any) => Promise<any>;
+	updateAccount: (c: any) => Promise<any>;
+	deleteAccount: (c: any) => Promise<any>;
+	findById: (c: any) => Promise<any>;
+	uploadImage: (c: any) => Promise<any>;
+	deleteImage: (c: any) => Promise<any>;
+};

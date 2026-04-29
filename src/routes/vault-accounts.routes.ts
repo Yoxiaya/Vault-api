@@ -1,22 +1,20 @@
 import { Hono } from 'hono';
 import { VaultAccountsController } from '../controllers/vault-accounts.controller';
+import { VaultAccountsService } from '../services/vault-accounts.service';
+import { Bindings, Variables } from '../types';
 
-let vaultAccountsController: VaultAccountsController;
-
-export const vaultAccountsRoutes = new Hono();
+export const vaultAccountsRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 vaultAccountsRoutes.use('*', async (c, next) => {
-	if (!vaultAccountsController) {
-		//@ts-ignore
-		vaultAccountsController = new VaultAccountsController(c.env.vault_db);
-	}
+	const vaultAccountsService = new VaultAccountsService(c.env.vault_db);
+	c.set('vaultAccountsController', new VaultAccountsController(vaultAccountsService));
 	await next();
 });
 
-vaultAccountsRoutes.get('/', (c) => vaultAccountsController.getAllAccounts(c));
-vaultAccountsRoutes.post('/', (c) => vaultAccountsController.createAccount(c));
-vaultAccountsRoutes.put('/:id', (c) => vaultAccountsController.updateAccount(c));
-vaultAccountsRoutes.delete('/:id', (c) => vaultAccountsController.deleteAccount(c));
-vaultAccountsRoutes.get('/:id', (c) => vaultAccountsController.findById(c));
-vaultAccountsRoutes.post('/upload-image', (c) => vaultAccountsController.uploadImage(c));
-vaultAccountsRoutes.post('/delete-image', (c) => vaultAccountsController.deleteImage(c));
+vaultAccountsRoutes.get('/', (c) => c.get('vaultAccountsController')!.getAllAccounts(c));
+vaultAccountsRoutes.post('/', (c) => c.get('vaultAccountsController')!.createAccount(c));
+vaultAccountsRoutes.put('/:id', (c) => c.get('vaultAccountsController')!.updateAccount(c));
+vaultAccountsRoutes.delete('/:id', (c) => c.get('vaultAccountsController')!.deleteAccount(c));
+vaultAccountsRoutes.get('/:id', (c) => c.get('vaultAccountsController')!.findById(c));
+vaultAccountsRoutes.post('/upload-image', (c) => c.get('vaultAccountsController')!.uploadImage(c));
+vaultAccountsRoutes.post('/delete-image', (c) => c.get('vaultAccountsController')!.deleteImage(c));

@@ -16,25 +16,41 @@
 ```
 Vault-api/
 ├── script/                # SQL 脚本
-│   ├── check-schema.sql     # 检查数据库结构
-│   ├── create-todo.sql      # 创建待办事项表
-│   └── create-vault-accounts.sql  # 创建保险库账户表
+│   ├── add-vault-accounts-field.sql
+│   ├── check-schema.sql
+│   ├── create-todo.sql
+│   ├── create-user.sql
+│   └── create-vault-accounts.sql
 ├── src/
 │   ├── config/            # 配置文件
-│   ├── controllers/       # 控制器
-│   │   ├── todo.controller.ts      # 待办事项控制器
-│   │   └── vault-accounts.controller.ts  # 保险库账户控制器
+│   │   └── index.ts
+│   ├── controllers/       # 控制器层
+│   │   ├── todo.controller.ts
+│   │   └── vault-accounts.controller.ts
 │   ├── db/                # 数据库相关
-│   │   ├── database.ts    # 数据库连接
-│   │   ├── schema.ts      # 待办事项数据模型
-│   │   └── vault-accounts.ts  # 保险库账户数据模型
-│   ├── routes/            # 路由
-│   │   ├── todo.routes.ts      # 待办事项路由
-│   │   └── vault-accounts.routes.ts  # 保险库账户路由
-│   ├── services/          # 服务层
-│   │   ├── todo.service.ts      # 待办事项服务
-│   │   └── vault-accounts.service.ts  # 保险库账户服务
+│   │   └── schema/        # 数据模型定义
+│   │       ├── accounts.ts
+│   │       ├── index.ts
+│   │       ├── sessions.ts
+│   │       ├── todos.ts
+│   │       └── users.ts
+│   ├── middlewares/       # 中间件层
+│   │   ├── error-handler.ts
+│   │   └── index.ts
+│   ├── repositories/      # 数据访问层
+│   │   ├── todo.repository.ts
+│   │   └── vault-accounts.repository.ts
+│   ├── routes/            # 路由层
+│   │   ├── todo.routes.ts
+│   │   └── vault-accounts.routes.ts
+│   ├── services/          # 业务逻辑层
+│   │   ├── todo.service.ts
+│   │   └── vault-accounts.service.ts
 │   ├── types/             # 类型定义
+│   │   ├── index.ts
+│   │   └── todo.ts
+│   ├── utils/             # 工具函数
+│   │   └── index.ts
 │   └── index.ts           # 应用入口
 ├── .gitignore
 ├── README.md
@@ -43,6 +59,16 @@ Vault-api/
 ├── tsconfig.json          # TypeScript 配置
 └── wrangler.jsonc         # Wrangler 配置
 ```
+
+## 架构说明
+
+项目采用分层架构设计，职责清晰：
+
+- **controllers**: 处理 HTTP 请求和响应，进行参数校验
+- **services**: 业务逻辑处理
+- **repositories**: 数据库访问操作
+- **middlewares**: 中间件（错误处理等）
+- **utils**: 通用工具函数
 
 ## 安装和设置
 
@@ -125,12 +151,15 @@ npm run deploy
 
 ### 保险库账户 API
 
-| 方法   | 端点                  | 描述               |
-| ------ | --------------------- | ------------------ |
-| GET    | `/vault-accounts`     | 获取所有保险库账户 |
-| POST   | `/vault-accounts`     | 创建新的保险库账户 |
-| PUT    | `/vault-accounts/:id` | 更新保险库账户     |
-| DELETE | `/vault-accounts/:id` | 删除保险库账户     |
+| 方法   | 端点                           | 描述               |
+| ------ | ------------------------------ | ------------------ |
+| GET    | `/vault-accounts`              | 获取所有保险库账户 |
+| POST   | `/vault-accounts`              | 创建新的保险库账户 |
+| GET    | `/vault-accounts/:id`          | 获取单个保险库账户 |
+| PUT    | `/vault-accounts/:id`          | 更新保险库账户     |
+| DELETE | `/vault-accounts/:id`          | 删除保险库账户     |
+| POST   | `/vault-accounts/upload-image` | 上传图片到 ImgBB   |
+| POST   | `/vault-accounts/delete-image` | 删除 ImgBB 图片    |
 
 ### 健康检查
 
@@ -162,19 +191,82 @@ Content-Type: application/json
 }
 ```
 
-### 获取待办事项
+### 获取待办事项列表
 
 **响应**:
 
 ```json
-[
-	{
+{
+	"success": true,
+	"data": [
+		{
+			"id": 1,
+			"title": "完成项目文档",
+			"completed": false,
+			"created_at": "2024-01-01T00:00:00Z"
+		}
+	]
+}
+```
+
+### 获取单个保险库账户
+
+**响应**:
+
+```json
+{
+	"success": true,
+	"data": {
 		"id": 1,
-		"title": "完成项目文档",
-		"completed": false,
+		"name": "账户名称",
+		"description": "账户描述",
+		"icon_url": "https://example.com/icon.png",
 		"created_at": "2024-01-01T00:00:00Z"
 	}
-]
+}
+```
+
+### 上传图片
+
+**请求**:
+
+```bash
+POST /vault-accounts/upload-image
+Content-Type: multipart/form-data
+
+file: <图片文件>
+```
+
+**响应**:
+
+```json
+{
+	"success": true,
+	"data": {
+		"url": "https://i.imgbb.com/xxx.jpg"
+	}
+}
+```
+
+## 统一响应格式
+
+所有 API 响应都遵循统一格式：
+
+```json
+{
+  "success": true,
+  "data": ...,
+  "message": "操作成功"
+}
+```
+
+或
+
+```json
+{
+	"success": false,
+	"error": "错误信息"
+}
 ```
 
 ## 环境变量
@@ -189,6 +281,7 @@ Content-Type: application/json
 - 本项目使用 TypeScript 开发，确保代码符合 TypeScript 类型定义
 - 所有 API 端点都支持 CORS 跨域请求
 - 开发环境使用本地数据库，部署时使用 Cloudflare D1 数据库
+- 图片上传使用 ImgBB API，配置在 `src/config/index.ts` 中
 
 ## 许可证
 
