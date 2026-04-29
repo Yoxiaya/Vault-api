@@ -5,10 +5,16 @@ export type Bindings = {
 	DATABASE_URL: string;
 	API_KEY: string;
 };
+export * from './auth.type';
 
 export type Variables = {
 	todoController?: TodoController;
 	vaultAccountsController?: VaultAccountsController;
+	authController?: AuthController;
+};
+
+export type AuthController = {
+	register: (c: any) => Promise<any>;
 };
 
 export type TodoController = {

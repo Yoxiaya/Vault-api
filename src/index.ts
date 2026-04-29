@@ -5,6 +5,7 @@ import { todoRoutes } from './routes/todo.routes';
 import { vaultAccountsRoutes } from './routes/vault-accounts.routes';
 import { Bindings, Variables } from './types/index';
 import { errorHandler } from './middlewares';
+import { authRoutes } from './routes/auth.routes';
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
@@ -14,6 +15,7 @@ app.use('*', errorHandler());
 
 app.route('/todos', todoRoutes);
 app.route('/vault-accounts', vaultAccountsRoutes);
+app.route('/auth', authRoutes);
 
 app.get('/', (c) => c.json({ status: 'ok', message: 'Vault API is running' }));
 
