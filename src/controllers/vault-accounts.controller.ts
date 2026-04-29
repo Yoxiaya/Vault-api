@@ -6,7 +6,8 @@ export class VaultAccountsController {
 
 	async getAllAccounts(c: Context) {
 		try {
-			const accounts = await this.service.findAll();
+			const session = c.get('session');
+			const accounts = await this.service.findAll(session.user_id);
 			return c.json({ success: true, data: accounts });
 		} catch (error) {
 			console.error('获取账户失败:', error);
@@ -17,7 +18,8 @@ export class VaultAccountsController {
 	async createAccount(c: Context) {
 		try {
 			const data = await c.req.json();
-			await this.service.createAccount(data);
+			const session = c.get('session');
+			await this.service.createAccount({ ...data, userId: session.user_id });
 			return c.json({ success: true, message: '创建成功' }, 201);
 		} catch (error) {
 			console.error('创建账户失败:', error);

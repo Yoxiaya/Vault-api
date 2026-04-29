@@ -11,6 +11,7 @@ export type Variables = {
 	todoController?: TodoController;
 	vaultAccountsController?: VaultAccountsController;
 	authController?: AuthController;
+	session?: Session | null;
 };
 
 export type AuthController = {

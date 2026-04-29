@@ -2,11 +2,18 @@ import { Hono } from 'hono';
 import { VaultAccountsController } from '../controllers/vault-accounts.controller';
 import { VaultAccountsService } from '../services/vault-accounts.service';
 import { Bindings, Variables } from '../types';
+import { authMiddleware } from '../middlewares';
 
 export const vaultAccountsRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 vaultAccountsRoutes.use('*', async (c, next) => {
 	const vaultAccountsService = new VaultAccountsService(c.env.vault_db);
+	try {
+		const session = await authMiddleware(c.env.vault_db, c.req.header('Authorization') || '');
+		c.set('session', session);
+	} catch (error) {
+		return c.json({ success: false, error: (error as Error).message }, 401);
+	}
 	c.set('vaultAccountsController', new VaultAccountsController(vaultAccountsService));
 	await next();
 });

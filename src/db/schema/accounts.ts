@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { users } from './index';
 
 export const accounts = sqliteTable('accounts', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
@@ -13,6 +14,9 @@ export const accounts = sqliteTable('accounts', {
 	twoFactorEnabled: integer('twoFactorEnabled', { mode: 'boolean' }).default(false),
 	storageType: text('storageType'),
 	description: text('description').default(''),
+	userId: integer('user_id')
+		.notNull()
+		.references(() => users.id, { onDelete: 'cascade' }),
 });
 
 export type Account = typeof accounts.$inferSelect;

@@ -54,4 +54,12 @@ export class AuthRepository {
 			user: { id: user.id, username: user.username, email: user.email },
 		};
 	}
+	async authMiddleware(token: string) {
+		const drizzleDb = drizzle(this.vault_db);
+		const session = await drizzleDb.select().from(sessions).where(eq(sessions.token, token)).get();
+		if (!session || new Date(session.expires_at) < new Date()) {
+			throw new Error('无效或过期的 token');
+		}
+		return session;
+	}
 }

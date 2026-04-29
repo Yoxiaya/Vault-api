@@ -6,9 +6,9 @@ import { eq } from 'drizzle-orm';
 export class VaultAccountsRepository {
 	constructor(private vault_db: Bindings['vault_db']) {}
 
-	async findAll(): Promise<Account[]> {
+	async findAll(userId: number): Promise<Account[]> {
 		const drizzleDb = drizzle(this.vault_db);
-		const result = await drizzleDb.select().from(accounts).orderBy(accounts.id);
+		const result = await drizzleDb.select().from(accounts).where(eq(accounts.userId, userId)).orderBy(accounts.id);
 		return result;
 	}
 

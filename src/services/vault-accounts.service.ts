@@ -10,8 +10,8 @@ export class VaultAccountsService {
 		this.repository = new VaultAccountsRepository(database);
 	}
 
-	async findAll(): Promise<Account[]> {
-		return this.repository.findAll();
+	async findAll(userId: number): Promise<Account[]> {
+		return this.repository.findAll(userId);
 	}
 
 	async createAccount(account: Account): Promise<void> {
@@ -41,7 +41,7 @@ export class VaultAccountsService {
 		return result.json();
 	}
 
-	async deleteImage(url: string): Promise<void> {
+	async deleteImage(url: string): Promise<any> {
 		const formData = new FormData();
 		formData.append('urls', url);
 		formData.append('token', IMAGE_API_TOKEN);
