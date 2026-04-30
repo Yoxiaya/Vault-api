@@ -15,3 +15,8 @@ SELECT COUNT(*) as total_rows FROM users;
 -- 查看表数据
 SELECT '=== Table Data ===' as "";
 SELECT * FROM users;
+-- 删除表数据
+DELETE FROM users;
+-- 增加新字段
+ALTER TABLE accounts
+ADD COLUMN user_id INTEGER;

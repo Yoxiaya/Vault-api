@@ -1,7 +1,7 @@
 import { Bindings } from '../types';
 import { drizzle } from 'drizzle-orm/d1';
 import { accounts, type Account } from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 export class VaultAccountsRepository {
 	constructor(private vault_db: Bindings['vault_db']) {}
@@ -19,12 +19,20 @@ export class VaultAccountsRepository {
 
 	async update(id: number, account: Account): Promise<void> {
 		const drizzleDb = drizzle(this.vault_db);
-		await drizzleDb.update(accounts).set(account).where(eq(accounts.id, id)).run();
+
+		await drizzleDb
+			.update(accounts)
+			.set(account)
+			.where(and(eq(accounts.id, id), eq(accounts.userId, account.userId)))
+			.run();
 	}
 
-	async delete(id: number): Promise<void> {
+	async delete(id: number, userId: number): Promise<void> {
 		const drizzleDb = drizzle(this.vault_db);
-		await drizzleDb.delete(accounts).where(eq(accounts.id, id)).run();
+		await drizzleDb
+			.delete(accounts)
+			.where(and(eq(accounts.id, id), eq(accounts.userId, userId)))
+			.run();
 	}
 
 	async findById(id: number): Promise<Account | null> {

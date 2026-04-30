@@ -22,8 +22,8 @@ export class VaultAccountsService {
 		await this.repository.update(id, account);
 	}
 
-	async deleteAccount(id: number): Promise<void> {
-		await this.repository.delete(id);
+	async deleteAccount(id: number, userId: number): Promise<void> {
+		await this.repository.delete(id, userId);
 	}
 
 	async findById(id: number): Promise<Account | null> {

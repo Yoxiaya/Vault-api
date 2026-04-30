@@ -31,12 +31,12 @@ export class VaultAccountsController {
 		try {
 			const id = parseInt(c.req.param('id') || '');
 			const data = await c.req.json();
-
+			const session = c.get('session');
 			if (isNaN(id)) {
 				return c.json({ success: false, error: '无效的ID' }, 400);
 			}
 
-			await this.service.updateAccount(id, data);
+			await this.service.updateAccount(id, { ...data, userId: session.user_id });
 			return c.json({ success: true, message: '更新成功' }, 200);
 		} catch (error) {
 			console.error('更新账户失败:', error);
@@ -47,12 +47,13 @@ export class VaultAccountsController {
 	async deleteAccount(c: Context) {
 		try {
 			const id = parseInt(c.req.param('id') || '');
+			const session = c.get('session');
 
 			if (isNaN(id)) {
 				return c.json({ success: false, error: '无效的ID' }, 400);
 			}
 
-			await this.service.deleteAccount(id);
+			await this.service.deleteAccount(id, session.user_id);
 			return c.json({ success: true, message: '删除成功' }, 200);
 		} catch (error) {
 			console.error('删除账户失败:', error);
