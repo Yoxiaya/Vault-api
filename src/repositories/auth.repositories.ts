@@ -41,14 +41,23 @@ export class AuthRepository {
 		if (!isMatch) {
 			throw new Error('账号或密码错误');
 		}
+		const isLogin = await drizzleDb.select().from(sessions).where(eq(sessions.user_id, user.id)).get();
 		const token = crypto.randomUUID();
 		const expiresAt = new Date();
 		expiresAt.setDate(expiresAt.getDate() + 7);
-		await drizzleDb.insert(sessions).values({
-			user_id: user.id,
-			token,
-			expires_at: new Date(expiresAt),
-		});
+		if (isLogin) {
+			await drizzleDb
+				.update(sessions)
+				.set({ token, expires_at: new Date(expiresAt) })
+				.where(eq(sessions.user_id, user.id));
+		} else {
+			await drizzleDb.insert(sessions).values({
+				user_id: user.id,
+				token,
+				expires_at: new Date(expiresAt),
+			});
+		}
+
 		return {
 			token,
 			user: { id: user.id, username: user.username, email: user.email },
