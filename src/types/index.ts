@@ -11,12 +11,19 @@ export type Variables = {
 	todoController?: TodoController;
 	vaultAccountsController?: VaultAccountsController;
 	authController?: AuthController;
+	profileController?: ProfileController;
 	session?: Session | null;
 };
 
 export type AuthController = {
 	register: (c: any) => Promise<any>;
 	login: (c: any) => Promise<any>;
+};
+
+export type ProfileController = {
+	getProfile: (c: any) => Promise<any>;
+	updateProfile: (c: any) => Promise<any>;
+	updateAvatar: (c: any) => Promise<any>;
 };
 
 export type TodoController = {

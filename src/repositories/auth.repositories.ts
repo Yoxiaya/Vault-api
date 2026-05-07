@@ -1,6 +1,6 @@
 import { Bindings, LoginInfo, RegisterUser } from '../types/index';
 import { drizzle } from 'drizzle-orm/d1';
-import { users, sessions, type User } from '../db/schema';
+import { users, sessions, profiles } from '../db/schema';
 import { eq, or } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 
@@ -18,10 +18,17 @@ export class AuthRepository {
 			throw new Error('用户名或邮箱已存在');
 		}
 		const passwordHash = await bcrypt.hash(user.password, 10);
-		await drizzleDb.insert(users).values({
-			username: user.username,
-			passwordHash: passwordHash,
-			email: user.email,
+		const [newUser] = await drizzleDb
+			.insert(users)
+			.values({
+				username: user.username,
+				passwordHash: passwordHash,
+				email: user.email,
+			})
+			.returning();
+		await drizzleDb.insert(profiles).values({
+			userId: newUser.id,
+			profileName: user.username,
 		});
 	}
 	async login(loginInfo: LoginInfo) {
@@ -63,6 +70,7 @@ export class AuthRepository {
 			user: { id: user.id, username: user.username, email: user.email },
 		};
 	}
+
 	async authMiddleware(token: string) {
 		const drizzleDb = drizzle(this.vault_db);
 		const session = await drizzleDb.select().from(sessions).where(eq(sessions.token, token)).get();

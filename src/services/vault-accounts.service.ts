@@ -2,6 +2,7 @@ import { VaultAccountsRepository } from '../repositories/vault-accounts.reposito
 import { Account } from '../db/schema';
 import { IMAGE_API_URL, IMAGE_API_TOKEN } from '../config/index';
 import { Bindings } from '../types';
+import { deleteImage, uploadImage } from '../utils';
 
 export class VaultAccountsService {
 	private repository: VaultAccountsRepository;
@@ -31,24 +32,10 @@ export class VaultAccountsService {
 	}
 
 	async uploadImage(image: File): Promise<any> {
-		const formData = new FormData();
-		formData.append('file', image);
-		formData.append('token', IMAGE_API_TOKEN);
-		const result = await fetch(`${IMAGE_API_URL}/upload`, {
-			method: 'POST',
-			body: formData,
-		});
-		return result.json();
+		return await uploadImage(image);
 	}
 
 	async deleteImage(url: string): Promise<any> {
-		const formData = new FormData();
-		formData.append('urls', url);
-		formData.append('token', IMAGE_API_TOKEN);
-		const result = await fetch(`${IMAGE_API_URL}/delete`, {
-			method: 'POST',
-			body: formData,
-		});
-		return result.json();
+		return await deleteImage(url);
 	}
 }
