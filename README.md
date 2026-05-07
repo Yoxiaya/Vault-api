@@ -25,31 +25,43 @@ Vault-api/
 │   ├── config/            # 配置文件
 │   │   └── index.ts
 │   ├── controllers/       # 控制器层
+│   │   ├── auth.controller.ts
+│   │   ├── profile.controller.ts
 │   │   ├── todo.controller.ts
 │   │   └── vault-accounts.controller.ts
 │   ├── db/                # 数据库相关
 │   │   └── schema/        # 数据模型定义
 │   │       ├── accounts.ts
 │   │       ├── index.ts
+│   │       ├── profile.ts
 │   │       ├── sessions.ts
 │   │       ├── todos.ts
 │   │       └── users.ts
 │   ├── middlewares/       # 中间件层
+│   │   ├── auth.middleware.ts
 │   │   ├── error-handler.ts
 │   │   └── index.ts
 │   ├── repositories/      # 数据访问层
+│   │   ├── auth.repositories.ts
+│   │   ├── profile.repositories.ts
 │   │   ├── todo.repository.ts
 │   │   └── vault-accounts.repository.ts
 │   ├── routes/            # 路由层
+│   │   ├── auth.routes.ts
+│   │   ├── profile.routes.ts
 │   │   ├── todo.routes.ts
 │   │   └── vault-accounts.routes.ts
 │   ├── services/          # 业务逻辑层
+│   │   ├── auth.service.ts
+│   │   ├── profile.service.ts
 │   │   ├── todo.service.ts
 │   │   └── vault-accounts.service.ts
 │   ├── types/             # 类型定义
+│   │   ├── auth.type.ts
 │   │   ├── index.ts
 │   │   └── todo.ts
 │   ├── utils/             # 工具函数
+│   │   ├── image.utils.ts
 │   │   └── index.ts
 │   └── index.ts           # 应用入口
 ├── .gitignore
@@ -146,6 +158,21 @@ npm run deploy
 
 ## API 端点
 
+### 认证 API
+
+| 方法 | 端点             | 描述     |
+| ---- | ---------------- | -------- |
+| POST | `/auth/register` | 用户注册 |
+| POST | `/auth/login`    | 用户登录 |
+
+### 用户资料 API
+
+| 方法 | 端点              | 描述             |
+| ---- | ----------------- | ---------------- |
+| GET  | `/profile`        | 获取当前用户资料 |
+| PUT  | `/profile`        | 更新用户资料     |
+| POST | `/profile/avatar` | 上传用户头像     |
+
 ### 待办事项 API
 
 | 方法   | 端点         | 描述                 |
@@ -155,7 +182,7 @@ npm run deploy
 | PUT    | `/todos/:id` | 切换待办事项完成状态 |
 | DELETE | `/todos/:id` | 删除待办事项         |
 
-### 保险库账户 API
+### 保险库账户 API（需要认证）
 
 | 方法   | 端点                           | 描述               |
 | ------ | ------------------------------ | ------------------ |
@@ -174,6 +201,55 @@ npm run deploy
 | GET  | `/`  | 健康检查端点 |
 
 ## 请求和响应示例
+
+### 用户注册
+
+**请求**:
+
+```json
+POST /auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "password123",
+  "email": "test@example.com"
+}
+```
+
+**响应**:
+
+```json
+{
+	"success": true,
+	"message": "注册成功"
+}
+```
+
+### 用户登录
+
+**请求**:
+
+```json
+POST /auth/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "password123"
+}
+```
+
+**响应**:
+
+```json
+{
+	"success": true,
+	"data": {
+		"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+	}
+}
+```
 
 ### 创建待办事项
 
