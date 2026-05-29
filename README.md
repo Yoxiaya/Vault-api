@@ -221,8 +221,8 @@ Content-Type: application/json
 
 ```json
 {
-	"success": true,
-	"message": "注册成功"
+  "success": true,
+  "message": "注册成功"
 }
 ```
 
@@ -244,10 +244,10 @@ Content-Type: application/json
 
 ```json
 {
-	"success": true,
-	"data": {
-		"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-	}
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
 }
 ```
 
@@ -268,8 +268,8 @@ Content-Type: application/json
 
 ```json
 {
-	"success": true,
-	"message": "创建成功"
+  "success": true,
+  "message": "创建成功"
 }
 ```
 
@@ -279,15 +279,15 @@ Content-Type: application/json
 
 ```json
 {
-	"success": true,
-	"data": [
-		{
-			"id": 1,
-			"title": "完成项目文档",
-			"completed": false,
-			"created_at": "2024-01-01T00:00:00Z"
-		}
-	]
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "title": "完成项目文档",
+      "completed": false,
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  ]
 }
 ```
 
@@ -297,14 +297,14 @@ Content-Type: application/json
 
 ```json
 {
-	"success": true,
-	"data": {
-		"id": 1,
-		"name": "账户名称",
-		"description": "账户描述",
-		"icon_url": "https://example.com/icon.png",
-		"created_at": "2024-01-01T00:00:00Z"
-	}
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "账户名称",
+    "description": "账户描述",
+    "icon_url": "https://example.com/icon.png",
+    "created_at": "2024-01-01T00:00:00Z"
+  }
 }
 ```
 
@@ -323,10 +323,10 @@ file: <图片文件>
 
 ```json
 {
-	"success": true,
-	"data": {
-		"url": "https://i.imgbb.com/xxx.jpg"
-	}
+  "success": true,
+  "data": {
+    "url": "https://i.imgbb.com/xxx.jpg"
+  }
 }
 ```
 
@@ -346,8 +346,8 @@ file: <图片文件>
 
 ```json
 {
-	"success": false,
-	"error": "错误信息"
+  "success": false,
+  "error": "错误信息"
 }
 ```
 
@@ -355,7 +355,6 @@ file: <图片文件>
 
 项目使用 Cloudflare Workers 的绑定功能，需要在 `wrangler.jsonc` 中配置以下绑定：
 
-- `todo_db`: D1 数据库绑定，用于待办事项
 - `vault_db`: D1 数据库绑定，用于保险库账户
 
 ## 注意事项

@@ -1,21 +1,14 @@
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "vault-api",
-	"main": "src/index.ts",
-	"compatibility_date": "2026-04-09",
-	"d1_databases": [
-		{
-			"binding": "todo_db",
-			"database_name": "todo-db",
-			"database_id": "7c4b2cdd-b6ea-4b6e-ac52-24b0f096b0f6",
-			"remote": true
-		}
-		,{
-			"binding": "vault_db",
-			"database_name": "vault",
-			"database_id": "15eee015-65c8-4375-897a-3c8ee2b5fc9e",
-			"remote": true
-		}
-	]
-
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vault-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-04-09",
+  "d1_databases": [
+    {
+      "binding": "vault_db",
+      "database_name": "vault",
+      "database_id": "15eee015-65c8-4375-897a-3c8ee2b5fc9e",
+      "remote": true,
+    },
+  ],
 }
