@@ -1,6 +1,5 @@
 // @ts-nocheck
 export type Bindings = {
-	todo_db: D1Database;
 	vault_db: D1Database;
 	DATABASE_URL: string;
 	API_KEY: string;
@@ -8,7 +7,6 @@ export type Bindings = {
 export * from './auth.type';
 
 export type Variables = {
-	todoController?: TodoController;
 	vaultAccountsController?: VaultAccountsController;
 	authController?: AuthController;
 	profileController?: ProfileController;
@@ -24,13 +22,6 @@ export type ProfileController = {
 	getProfile: (c: any) => Promise<any>;
 	updateProfile: (c: any) => Promise<any>;
 	updateAvatar: (c: any) => Promise<any>;
-};
-
-export type TodoController = {
-	getAllTodos: (c: any) => Promise<any>;
-	createTodo: (c: any) => Promise<any>;
-	toggleComplete: (c: any) => Promise<any>;
-	deleteTodo: (c: any) => Promise<any>;
 };
 
 export type VaultAccountsController = {
