@@ -1,10 +1,16 @@
-import { Bindings } from '../types';
+import { Resend } from 'resend';
 import { eq, and } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/d1';
+import { Bindings } from '../types';
 import { emailVerifications } from '../db/schema/email-verifications';
+import { EMAIL_API_TOKEN } from '../config';
 
 export class EmailCodeService {
-	constructor(private vault_db: Bindings['vault_db']) {}
+	private resend: Resend;
+
+	constructor(private vault_db: Bindings['vault_db']) {
+		this.resend = new Resend(EMAIL_API_TOKEN);
+	}
 
 	async sendVerificationCode(email: string) {
 		const drizzleDb = drizzle(this.vault_db);
@@ -62,6 +68,11 @@ export class EmailCodeService {
 		return Math.floor(100000 + Math.random() * 900000).toString();
 	}
 	private async sendEmail(email: string, code: string) {
-		console.log(`发送验证码到 ${email}：${code}`);
+		await this.resend.emails.send({
+			from: 'Vault<noreply@yoxiaya.com>',
+			to: [email],
+			subject: 'Vault 验证码',
+			html: `<p>您的验证码是：${code}</p>`,
+		});
 	}
 }
