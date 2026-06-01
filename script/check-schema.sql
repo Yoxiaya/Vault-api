@@ -17,6 +17,8 @@ SELECT '=== Table Data ===' as "";
 SELECT * FROM users;
 -- 删除表数据
 DELETE FROM users;
+-- 删除表里某一条数据
+DELETE FROM users WHERE id = 1;
 -- 增加新字段
 ALTER TABLE accounts
 ADD COLUMN user_id INTEGER;

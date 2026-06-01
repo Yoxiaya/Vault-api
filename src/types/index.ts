@@ -10,6 +10,7 @@ export type Variables = {
 	vaultAccountsController?: VaultAccountsController;
 	authController?: AuthController;
 	profileController?: ProfileController;
+	emailCodeController?: EmailCodeController;
 	session?: Session | null;
 };
 
@@ -32,4 +33,8 @@ export type VaultAccountsController = {
 	findById: (c: any) => Promise<any>;
 	uploadImage: (c: any) => Promise<any>;
 	deleteImage: (c: any) => Promise<any>;
+};
+
+export type EmailCodeController = {
+	sendCode: (c: any) => Promise<any>;
 };
