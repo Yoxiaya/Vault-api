@@ -9,7 +9,16 @@ import { authRoutes } from './routes/auth.routes';
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
-app.use('*', cors());
+app.use(
+  '*',
+  cors({
+    origin: '*',
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposeHeaders: ['Content-Length'],
+    maxAge: 86400,
+  }),
+);
 app.use('*', logger());
 app.use('*', errorHandler());
 
