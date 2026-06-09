@@ -6,13 +6,14 @@ import { profileRoutes } from './routes/profile.routes';
 import { Bindings, Variables } from './types/index';
 import { errorHandler } from './middlewares';
 import { authRoutes } from './routes/auth.routes';
+import { CORS_ORIGIN } from './config';
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 app.use(
 	'*',
 	cors({
-		origin: ['https://vaultweb.yoxiaya.com', 'http://localhost:5173'],
+		origin: CORS_ORIGIN,
 		credentials: true,
 		allowHeaders: ['Content-Type', 'Authorization'],
 	})
