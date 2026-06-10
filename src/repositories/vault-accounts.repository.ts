@@ -37,8 +37,6 @@ export class VaultAccountsRepository {
 
 	async findById(id: number): Promise<Account | null> {
 		const drizzleDb = drizzle(this.vault_db);
-		const result = await drizzleDb.select().from(accounts).where(eq(accounts.id, id)).run();
-		const account = result.results[0];
-		return account;
+		return await drizzleDb.select().from(accounts).where(eq(accounts.id, id)).get();
 	}
 }

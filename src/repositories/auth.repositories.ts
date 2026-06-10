@@ -3,6 +3,7 @@ import { drizzle } from 'drizzle-orm/d1';
 import { users, sessions, profiles } from '../db/schema';
 import { eq, or } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
+import { AppError } from '../utils';
 
 export class AuthRepository {
 	constructor(private vault_db: Bindings['vault_db']) {}
@@ -15,7 +16,7 @@ export class AuthRepository {
 			.where(or(eq(users.username, user.username), eq(users.email, user.email)))
 			.run();
 		if (exists.results.length > 0) {
-			throw new Error('用户名或邮箱已存在');
+			throw new AppError('用户名或邮箱已存在', 409);
 		}
 		const passwordHash = await bcrypt.hash(user.password, 10);
 		const [newUser] = await drizzleDb
@@ -42,26 +43,26 @@ export class AuthRepository {
 			user = await drizzleDb.select().from(users).where(eq(users.username, loginInfo.account)).get();
 		}
 		if (!user) {
-			throw new Error('用户不存在');
+			throw new AppError('用户不存在', 404);
 		}
 		const isMatch = await bcrypt.compare(loginInfo.password, user.passwordHash);
 		if (!isMatch) {
-			throw new Error('账号或密码错误');
+			throw new AppError('账号或密码错误', 401);
 		}
-		const isLogin = await drizzleDb.select().from(sessions).where(eq(sessions.user_id, user.id)).get();
+		const existingSession = await drizzleDb.select().from(sessions).where(eq(sessions.user_id, user.id)).get();
 		const token = crypto.randomUUID();
 		const expiresAt = new Date();
 		expiresAt.setDate(expiresAt.getDate() + 7);
-		if (isLogin) {
+		if (existingSession) {
 			await drizzleDb
 				.update(sessions)
-				.set({ token, expires_at: new Date(expiresAt) })
+				.set({ token, expires_at: expiresAt })
 				.where(eq(sessions.user_id, user.id));
 		} else {
 			await drizzleDb.insert(sessions).values({
 				user_id: user.id,
 				token,
-				expires_at: new Date(expiresAt),
+				expires_at: expiresAt,
 			});
 		}
 
@@ -69,14 +70,5 @@ export class AuthRepository {
 			token,
 			user: { id: user.id, username: user.username, email: user.email },
 		};
-	}
-
-	async authMiddleware(token: string) {
-		const drizzleDb = drizzle(this.vault_db);
-		const session = await drizzleDb.select().from(sessions).where(eq(sessions.token, token)).get();
-		if (!session || new Date(session.expires_at) < new Date()) {
-			throw new Error('无效或过期的 token');
-		}
-		return session;
 	}
 }

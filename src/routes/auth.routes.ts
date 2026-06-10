@@ -8,8 +8,8 @@ import { Bindings, Variables } from '../types';
 export const authRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 authRoutes.use('*', async (c, next) => {
-	const authService = new AuthService(c.env.vault_db);
-	const emailCodeService = new EmailCodeService(c.env.vault_db);
+	const authService = new AuthService(c.env.vault_db, c.env.EMAIL_API_TOKEN);
+	const emailCodeService = new EmailCodeService(c.env.vault_db, c.env.EMAIL_API_TOKEN);
 
 	c.set('authController', new AuthController(authService));
 	c.set('emailCodeController', new EmailCodeController(emailCodeService));

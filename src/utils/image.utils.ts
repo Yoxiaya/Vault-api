@@ -1,20 +1,18 @@
-import { IMAGE_API_TOKEN, IMAGE_API_URL } from '../config';
-
-export const uploadImage = async (image: File) => {
+export const uploadImage = async (image: File, apiUrl: string, apiToken: string) => {
 	const formData = new FormData();
 	formData.append('file', image);
-	formData.append('token', IMAGE_API_TOKEN);
-	const result = await fetch(`${IMAGE_API_URL}/upload`, {
+	formData.append('token', apiToken);
+	const result = await fetch(`${apiUrl}/upload`, {
 		method: 'POST',
 		body: formData,
 	});
 	return result.json();
 };
-export const deleteImage = async (url: string) => {
+export const deleteImage = async (url: string, apiUrl: string, apiToken: string) => {
 	const formData = new FormData();
 	formData.append('urls', url);
-	formData.append('token', IMAGE_API_TOKEN);
-	const result = await fetch(`${IMAGE_API_URL}/delete`, {
+	formData.append('token', apiToken);
+	const result = await fetch(`${apiUrl}/delete`, {
 		method: 'POST',
 		body: formData,
 	});

@@ -1,6 +1,6 @@
 # Vault API
 
-一个基于 Cloudflare Workers 和 Hono 框架的 API 服务，提供待办事项管理和保险库账户管理功能。
+一个基于 Cloudflare Workers 和 Hono 框架的 API 服务，提供用户认证、个人资料管理和保险库账户管理功能。
 
 ## 技术栈
 
@@ -15,72 +15,89 @@
 
 ```
 Vault-api/
-├── script/                # SQL 脚本
+├── script/                    # SQL 脚本（数据库诊断等）
 │   ├── add-vault-accounts-field.sql
 │   ├── check-schema.sql
-│   ├── create-todo.sql
+│   ├── create-email-verifications.sql
 │   ├── create-user.sql
-│   └── create-vault-accounts.sql
+│   ├── create-vault-accounts.sql
+│   └── syncDbData.sh
 ├── src/
-│   ├── config/            # 配置文件
+│   ├── config/                # 非敏感配置
 │   │   └── index.ts
-│   ├── controllers/       # 控制器层
+│   ├── controllers/           # 控制器层（HTTP 请求/响应处理）
 │   │   ├── auth.controller.ts
+│   │   ├── email-code.controller.ts
 │   │   ├── profile.controller.ts
-│   │   ├── todo.controller.ts
 │   │   └── vault-accounts.controller.ts
-│   ├── db/                # 数据库相关
-│   │   └── schema/        # 数据模型定义
-│   │       ├── accounts.ts
-│   │       ├── index.ts
-│   │       ├── profile.ts
-│   │       ├── sessions.ts
-│   │       ├── todos.ts
-│   │       └── users.ts
-│   ├── middlewares/       # 中间件层
+│   ├── db/schema/             # Drizzle ORM 数据模型
+│   │   ├── accounts.ts
+│   │   ├── email-verifications.ts
+│   │   ├── index.ts
+│   │   ├── profile.ts
+│   │   ├── sessions.ts
+│   │   └── users.ts
+│   ├── middlewares/           # 中间件（认证、错误处理）
 │   │   ├── auth.middleware.ts
 │   │   ├── error-handler.ts
 │   │   └── index.ts
-│   ├── repositories/      # 数据访问层
+│   ├── repositories/          # 数据访问层
 │   │   ├── auth.repositories.ts
 │   │   ├── profile.repositories.ts
-│   │   ├── todo.repository.ts
 │   │   └── vault-accounts.repository.ts
-│   ├── routes/            # 路由层
+│   ├── routes/                # 路由定义
 │   │   ├── auth.routes.ts
 │   │   ├── profile.routes.ts
-│   │   ├── todo.routes.ts
 │   │   └── vault-accounts.routes.ts
-│   ├── services/          # 业务逻辑层
+│   ├── services/              # 业务逻辑层
 │   │   ├── auth.service.ts
+│   │   ├── email-code.service.ts
 │   │   ├── profile.service.ts
-│   │   ├── todo.service.ts
 │   │   └── vault-accounts.service.ts
-│   ├── types/             # 类型定义
+│   ├── types/                 # TypeScript 类型定义
 │   │   ├── auth.type.ts
-│   │   ├── index.ts
-│   │   └── todo.ts
-│   ├── utils/             # 工具函数
+│   │   └── index.ts
+│   ├── utils/                 # 工具函数
+│   │   ├── app-error.ts
 │   │   ├── image.utils.ts
 │   │   └── index.ts
-│   └── index.ts           # 应用入口
+│   └── index.ts               # 应用入口
+├── .dev.vars                  # 本地开发环境变量（不提交）
 ├── .gitignore
-├── README.md
-├── drizzle.config.ts      # Drizzle ORM 配置
+├── .prettierrc
+├── drizzle.config.ts
 ├── package.json
-├── tsconfig.json          # TypeScript 配置
-└── wrangler.jsonc         # Wrangler 配置
+├── tsconfig.json
+└── wrangler.jsonc
 ```
 
 ## 架构说明
 
 项目采用分层架构设计，职责清晰：
 
-- **controllers**: 处理 HTTP 请求和响应，进行参数校验
+- **controllers**: 处理 HTTP 请求和响应，参数校验
 - **services**: 业务逻辑处理
 - **repositories**: 数据库访问操作
-- **middlewares**: 中间件（错误处理等）
-- **utils**: 通用工具函数
+- **middlewares**: 中间件（认证、统一错误处理）
+- **utils**: 通用工具函数（图片上传、自定义错误类）
+
+错误处理采用全局统一处理模式：业务层抛出 `AppError`，由全局 `errorHandler` 中间件捕获并按状态码返回。
+
+## 环境变量
+
+项目使用 Cloudflare Workers 环境变量管理敏感配置。本地开发时在 `.dev.vars` 中配置：
+
+```bash
+IMAGE_API_TOKEN=your_image_api_token
+EMAIL_API_TOKEN=your_resend_api_token
+```
+
+生产环境使用 `wrangler secret put` 设置：
+
+```bash
+wrangler secret put IMAGE_API_TOKEN
+wrangler secret put EMAIL_API_TOKEN
+```
 
 ## 安装和设置
 
@@ -97,12 +114,13 @@ cd Vault-api
 npm install
 ```
 
-### 3. 配置 Cloudflare Workers
+### 3. 配置环境变量
 
-确保你已经安装了 Wrangler 并登录到 Cloudflare 账户：
+复制 `.dev.vars.example` 或直接创建 `.dev.vars` 文件，填入必要的 API 密钥。
+
+### 4. 配置 Cloudflare Workers
 
 ```bash
-npm install -g wrangler
 wrangler login
 ```
 
@@ -117,36 +135,17 @@ wrangler d1 create vault
 ### 创建表结构
 
 ```bash
-npx wrangler d1 execute vault --local --file "script/create-todo.sql"
+npx wrangler d1 execute vault --local --file "script/create-user.sql"
 npx wrangler d1 execute vault --local --file "script/create-vault-accounts.sql"
+npx wrangler d1 execute vault --local --file "script/create-email-verifications.sql"
 ```
 
 ## 开发和部署
 
-### wrangler 命令
-
-> 使用本地数据库开发
+### 本地开发
 
 ```bash
-npx wrangler dev --local
-```
-
-> 运行 SQL 语句
-
-```bash
-npx wrangler d1 execute 数据库名称 --local --command "SQL 语句"
-```
-
-> 运行 SQL 脚本
-
-```bash
-npx wrangler d1 execute 数据库名称 --local --file "SQL 脚本路径"
-```
-
-> 查看本地数据库表结构
-
-```bash
-npx wrangler d1 execute vault_db --local --file "script/check-schema.sql"
+npm run dev
 ```
 
 ### 部署到 Cloudflare
@@ -155,31 +154,35 @@ npx wrangler d1 execute vault_db --local --file "script/check-schema.sql"
 npm run deploy
 ```
 
+### 同步线上数据库到本地
+
+```bash
+npm run sync
+```
+
+### 查看数据库表结构
+
+```bash
+npx wrangler d1 execute vault_db --local --file "script/check-schema.sql"
+```
+
 ## API 端点
 
 ### 认证 API
 
-| 方法 | 端点             | 描述     |
-| ---- | ---------------- | -------- |
-| POST | `/auth/register` | 用户注册 |
-| POST | `/auth/login`    | 用户登录 |
+| 方法 | 端点              | 描述           |
+| ---- | ----------------- | -------------- |
+| POST | `/auth/register`  | 用户注册       |
+| POST | `/auth/login`     | 用户登录       |
+| POST | `/auth/send-code` | 发送邮箱验证码 |
 
-### 用户资料 API
+### 用户资料 API（需要认证）
 
-| 方法 | 端点              | 描述             |
-| ---- | ----------------- | ---------------- |
-| GET  | `/profile`        | 获取当前用户资料 |
-| PUT  | `/profile`        | 更新用户资料     |
-| POST | `/profile/avatar` | 上传用户头像     |
-
-### 待办事项 API
-
-| 方法   | 端点         | 描述                 |
-| ------ | ------------ | -------------------- |
-| GET    | `/todos`     | 获取所有待办事项     |
-| POST   | `/todos`     | 创建新的待办事项     |
-| PUT    | `/todos/:id` | 切换待办事项完成状态 |
-| DELETE | `/todos/:id` | 删除待办事项         |
+| 方法 | 端点                  | 描述             |
+| ---- | --------------------- | ---------------- |
+| GET  | `/user/profile`       | 获取当前用户资料 |
+| POST | `/user/updateProfile` | 更新用户资料     |
+| POST | `/user/updateAvatar`  | 上传用户头像     |
 
 ### 保险库账户 API（需要认证）
 
@@ -190,8 +193,8 @@ npm run deploy
 | GET    | `/vault-accounts/:id`          | 获取单个保险库账户 |
 | PUT    | `/vault-accounts/:id`          | 更新保险库账户     |
 | DELETE | `/vault-accounts/:id`          | 删除保险库账户     |
-| POST   | `/vault-accounts/upload-image` | 上传图片到 ImgBB   |
-| POST   | `/vault-accounts/delete-image` | 删除 ImgBB 图片    |
+| POST   | `/vault-accounts/upload-image` | 上传图片           |
+| POST   | `/vault-accounts/delete-image` | 删除图片           |
 
 ### 健康检查
 
@@ -199,139 +202,9 @@ npm run deploy
 | ---- | ---- | ------------ |
 | GET  | `/`  | 健康检查端点 |
 
-## 请求和响应示例
-
-### 用户注册
-
-**请求**:
-
-```json
-POST /auth/register
-Content-Type: application/json
-
-{
-  "username": "testuser",
-  "password": "password123",
-  "email": "test@example.com"
-}
-```
-
-**响应**:
-
-```json
-{
-	"success": true,
-	"message": "注册成功"
-}
-```
-
-### 用户登录
-
-**请求**:
-
-```json
-POST /auth/login
-Content-Type: application/json
-
-{
-  "username": "testuser",
-  "password": "password123"
-}
-```
-
-**响应**:
-
-```json
-{
-	"success": true,
-	"data": {
-		"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-	}
-}
-```
-
-### 创建待办事项
-
-**请求**:
-
-```json
-POST /todos
-Content-Type: application/json
-
-{
-  "title": "完成项目文档"
-}
-```
-
-**响应**:
-
-```json
-{
-	"success": true,
-	"message": "创建成功"
-}
-```
-
-### 获取待办事项列表
-
-**响应**:
-
-```json
-{
-	"success": true,
-	"data": [
-		{
-			"id": 1,
-			"title": "完成项目文档",
-			"completed": false,
-			"created_at": "2024-01-01T00:00:00Z"
-		}
-	]
-}
-```
-
-### 获取单个保险库账户
-
-**响应**:
-
-```json
-{
-	"success": true,
-	"data": {
-		"id": 1,
-		"name": "账户名称",
-		"description": "账户描述",
-		"icon_url": "https://example.com/icon.png",
-		"created_at": "2024-01-01T00:00:00Z"
-	}
-}
-```
-
-### 上传图片
-
-**请求**:
-
-```bash
-POST /vault-accounts/upload-image
-Content-Type: multipart/form-data
-
-file: <图片文件>
-```
-
-**响应**:
-
-```json
-{
-	"success": true,
-	"data": {
-		"url": "https://i.imgbb.com/xxx.jpg"
-	}
-}
-```
-
 ## 统一响应格式
 
-所有 API 响应都遵循统一格式：
+成功响应：
 
 ```json
 {
@@ -341,27 +214,14 @@ file: <图片文件>
 }
 ```
 
-或
+失败响应：
 
 ```json
 {
-	"success": false,
-	"error": "错误信息"
+  "success": false,
+  "error": "错误信息"
 }
 ```
-
-## 环境变量
-
-项目使用 Cloudflare Workers 的绑定功能，需要在 `wrangler.jsonc` 中配置以下绑定：
-
-- `vault_db`: D1 数据库绑定，用于保险库账户
-
-## 注意事项
-
-- 本项目使用 TypeScript 开发，确保代码符合 TypeScript 类型定义
-- 所有 API 端点都支持 CORS 跨域请求
-- 开发环境使用本地数据库，部署时使用 Cloudflare D1 数据库
-- 图片上传使用 ImgBB API，配置在 `src/config/index.ts` 中
 
 ## 许可证
 

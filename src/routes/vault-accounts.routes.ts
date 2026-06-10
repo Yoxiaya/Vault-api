@@ -7,13 +7,9 @@ import { authMiddleware } from '../middlewares';
 export const vaultAccountsRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 vaultAccountsRoutes.use('*', async (c, next) => {
-	const vaultAccountsService = new VaultAccountsService(c.env.vault_db);
-	try {
-		const session = await authMiddleware(c.env.vault_db, c.req.header('Authorization') || '');
-		c.set('session', session);
-	} catch (error) {
-		return c.json({ success: false, error: (error as Error).message }, 401);
-	}
+	const vaultAccountsService = new VaultAccountsService(c.env.vault_db, c.env.IMAGE_API_URL, c.env.IMAGE_API_TOKEN);
+	const session = await authMiddleware(c.env.vault_db, c.req.header('Authorization') || '');
+	c.set('session', session);
 	c.set('vaultAccountsController', new VaultAccountsController(vaultAccountsService));
 	await next();
 });

@@ -2,14 +2,14 @@ import { Resend } from 'resend';
 import { eq, and } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/d1';
 import { Bindings } from '../types';
-import { emailVerifications } from '../db/schema/email-verifications';
-import { EMAIL_API_TOKEN } from '../config';
+import { emailVerifications } from '../db/schema';
+import { AppError } from '../utils';
 
 export class EmailCodeService {
 	private resend: Resend;
 
-	constructor(private vault_db: Bindings['vault_db']) {
-		this.resend = new Resend(EMAIL_API_TOKEN);
+	constructor(private vault_db: Bindings['vault_db'], emailApiToken: string) {
+		this.resend = new Resend(emailApiToken);
 	}
 
 	async sendVerificationCode(email: string) {
@@ -22,7 +22,7 @@ export class EmailCodeService {
 			.get();
 
 		if (existing && existing.createdAt && new Date(existing.createdAt) > new Date(Date.now() - 60000)) {
-			throw new Error('发送过于频繁，请稍后再试');
+			throw new AppError('发送过于频繁，请稍后再试', 429);
 		}
 
 		const code = this.generateCode();

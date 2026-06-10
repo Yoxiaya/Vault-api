@@ -1,14 +1,17 @@
 import { VaultAccountsRepository } from '../repositories/vault-accounts.repository';
 import { Account } from '../db/schema';
-import { IMAGE_API_URL, IMAGE_API_TOKEN } from '../config/index';
 import { Bindings } from '../types';
 import { deleteImage, uploadImage } from '../utils';
 
 export class VaultAccountsService {
 	private repository: VaultAccountsRepository;
+	private imageApiUrl: string;
+	private imageApiToken: string;
 
-	constructor(database: Bindings['vault_db']) {
+	constructor(database: Bindings['vault_db'], imageApiUrl: string, imageApiToken: string) {
 		this.repository = new VaultAccountsRepository(database);
+		this.imageApiUrl = imageApiUrl;
+		this.imageApiToken = imageApiToken;
 	}
 
 	async findAll(userId: number): Promise<Account[]> {
@@ -32,10 +35,10 @@ export class VaultAccountsService {
 	}
 
 	async uploadImage(image: File): Promise<any> {
-		return await uploadImage(image);
+		return await uploadImage(image, this.imageApiUrl, this.imageApiToken);
 	}
 
 	async deleteImage(url: string): Promise<any> {
-		return await deleteImage(url);
+		return await deleteImage(url, this.imageApiUrl, this.imageApiToken);
 	}
 }

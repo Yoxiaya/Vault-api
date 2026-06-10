@@ -1,8 +1,11 @@
-// @ts-nocheck
+import type { Session } from '../db/schema/sessions';
+import type { Context } from 'hono';
+
 export type Bindings = {
 	vault_db: D1Database;
-	DATABASE_URL: string;
-	API_KEY: string;
+	IMAGE_API_URL: string;
+	IMAGE_API_TOKEN: string;
+	EMAIL_API_TOKEN: string;
 };
 export * from './auth.type';
 
@@ -14,27 +17,28 @@ export type Variables = {
 	session?: Session | null;
 };
 
-export type AuthController = {
-	register: (c: any) => Promise<any>;
-	login: (c: any) => Promise<any>;
-};
+// Controller 类型定义 — 用于 Variables 中 c.get()/c.set() 的类型推断
+export interface AuthController {
+	register(c: Context): Promise<Response>;
+	login(c: Context): Promise<Response>;
+}
 
-export type ProfileController = {
-	getProfile: (c: any) => Promise<any>;
-	updateProfile: (c: any) => Promise<any>;
-	updateAvatar: (c: any) => Promise<any>;
-};
+export interface ProfileController {
+	getProfile(c: Context): Promise<Response>;
+	updateProfile(c: Context): Promise<Response>;
+	updateAvatar(c: Context): Promise<Response>;
+}
 
-export type VaultAccountsController = {
-	getAllAccounts: (c: any) => Promise<any>;
-	createAccount: (c: any) => Promise<any>;
-	updateAccount: (c: any) => Promise<any>;
-	deleteAccount: (c: any) => Promise<any>;
-	findById: (c: any) => Promise<any>;
-	uploadImage: (c: any) => Promise<any>;
-	deleteImage: (c: any) => Promise<any>;
-};
+export interface VaultAccountsController {
+	getAllAccounts(c: Context): Promise<Response>;
+	createAccount(c: Context): Promise<Response>;
+	updateAccount(c: Context): Promise<Response>;
+	deleteAccount(c: Context): Promise<Response>;
+	findById(c: Context): Promise<Response>;
+	uploadImage(c: Context): Promise<Response>;
+	deleteImage(c: Context): Promise<Response>;
+}
 
-export type EmailCodeController = {
-	sendCode: (c: any) => Promise<any>;
-};
+export interface EmailCodeController {
+	sendCode(c: Context): Promise<Response>;
+}

@@ -5,13 +5,9 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "skipLibCheck": true,
-
-    "lib": [
-      "ESNext",
-      "ES2022",
-      "DOM"
-    ],
+    "lib": ["ESNext"],
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
-  },
+    "jsxImportSource": "hono/jsx",
+    "types": ["@cloudflare/workers-types"]
+  }
 }
