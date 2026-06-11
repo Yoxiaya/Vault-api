@@ -7,6 +7,7 @@
     "sync": "bash ./script/syncDbData.sh",
     "deploy": "wrangler deploy --minify",
     "build": "echo 'Build completed'",
+    "format": "prettier --write \"src/**/*.ts\"",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings"
   },
   "dependencies": {

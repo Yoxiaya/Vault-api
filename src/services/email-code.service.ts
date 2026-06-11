@@ -7,11 +7,14 @@ import { AppError } from '../utils';
 
 export class EmailCodeService {
 	private resend: Resend | null = null;
+	private drizzleDb: ReturnType<typeof drizzle>;
 
 	constructor(
 		private vault_db: Bindings['vault_db'],
 		private emailApiToken: string
-	) {}
+	) {
+		this.drizzleDb = drizzle(vault_db);
+	}
 
 	private getResend(): Resend | null {
 		if (!this.resend && this.emailApiToken) {
@@ -21,7 +24,7 @@ export class EmailCodeService {
 	}
 
 	async sendVerificationCode(email: string) {
-		const drizzleDb = drizzle(this.vault_db);
+		const drizzleDb = this.drizzleDb;
 
 		const existing = await drizzleDb
 			.select()
@@ -51,7 +54,7 @@ export class EmailCodeService {
 	}
 
 	async verifyCode(email: string, code: string): Promise<boolean> {
-		const drizzleDb = drizzle(this.vault_db);
+		const drizzleDb = this.drizzleDb;
 
 		const verification = await drizzleDb
 			.select()

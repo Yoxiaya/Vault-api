@@ -1,5 +1,5 @@
-export { accounts, Account, NewAccount } from './accounts';
-export { users, User, NewUser } from './users';
-export { sessions, Session, NewSession } from './sessions';
-export { profiles, Profile, NewProfile } from './profile';
-export { emailVerifications, EmailVerification, NewEmailVerification } from './email-verifications';
+export { accounts, type Account } from './accounts';
+export { users, type User } from './users';
+export { sessions, type Session } from './sessions';
+export { profiles, type Profile } from './profile';
+export { emailVerifications } from './email-verifications';

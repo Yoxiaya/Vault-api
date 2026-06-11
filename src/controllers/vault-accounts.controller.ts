@@ -19,36 +19,22 @@ export class VaultAccountsController {
 	}
 
 	async updateAccount(c: Context) {
-		const id = parseInt(c.req.param('id') || '');
+		const id = this.parseId(c.req.param('id'));
 		const data = await c.req.json();
 		const session = c.get('session');
-		if (isNaN(id)) {
-			throw new AppError('无效的ID', 400);
-		}
-
 		await this.service.updateAccount(id, { ...data, userId: session.user_id });
 		return c.json({ success: true, message: '更新成功' }, 200);
 	}
 
 	async deleteAccount(c: Context) {
-		const id = parseInt(c.req.param('id') || '');
+		const id = this.parseId(c.req.param('id'));
 		const session = c.get('session');
-
-		if (isNaN(id)) {
-			throw new AppError('无效的ID', 400);
-		}
-
 		await this.service.deleteAccount(id, session.user_id);
 		return c.json({ success: true, message: '删除成功' }, 200);
 	}
 
 	async findById(c: Context) {
-		const id = parseInt(c.req.param('id') || '');
-
-		if (isNaN(id)) {
-			throw new AppError('无效的ID', 400);
-		}
-
+		const id = this.parseId(c.req.param('id'));
 		const account = await this.service.findById(id);
 		if (!account) {
 			throw new AppError('账户不存在', 404);
@@ -78,5 +64,13 @@ export class VaultAccountsController {
 
 		await this.service.deleteImage(url);
 		return c.json({ success: true, message: '删除成功' });
+	}
+
+	private parseId(param: string | undefined): number {
+		const id = parseInt(param || '');
+		if (isNaN(id)) {
+			throw new AppError('无效的ID', 400);
+		}
+		return id;
 	}
 }

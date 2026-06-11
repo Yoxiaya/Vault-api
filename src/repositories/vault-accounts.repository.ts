@@ -1,7 +1,7 @@
-import { Bindings } from '../types';
-import { drizzle } from 'drizzle-orm/d1';
-import { accounts, type Account } from '../db/schema';
 import { eq, and } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/d1';
+import { Bindings } from '../types';
+import { accounts, type Account } from '../db/schema';
 
 export class VaultAccountsRepository {
 	constructor(private vault_db: Bindings['vault_db']) {}
@@ -37,6 +37,6 @@ export class VaultAccountsRepository {
 
 	async findById(id: number): Promise<Account | null> {
 		const drizzleDb = drizzle(this.vault_db);
-		return await drizzleDb.select().from(accounts).where(eq(accounts.id, id)).get();
+		return (await drizzleDb.select().from(accounts).where(eq(accounts.id, id)).get()) ?? null;
 	}
 }

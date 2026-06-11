@@ -54,10 +54,7 @@ export class AuthRepository {
 		const expiresAt = new Date();
 		expiresAt.setDate(expiresAt.getDate() + 7);
 		if (existingSession) {
-			await drizzleDb
-				.update(sessions)
-				.set({ token, expires_at: expiresAt })
-				.where(eq(sessions.user_id, user.id));
+			await drizzleDb.update(sessions).set({ token, expires_at: expiresAt }).where(eq(sessions.user_id, user.id));
 		} else {
 			await drizzleDb.insert(sessions).values({
 				user_id: user.id,
