@@ -1,12 +1,27 @@
-#!/bin/bash
-# 列出所有 D1 数据库
-npx wrangler d1 list
+#!/usr/bin/env bash
+set -euo pipefail
 
-# 导出线上数据
-npx wrangler d1 export vault --output=./online-dump.sql --remote
+###############################################################################
+# 将远程 D1 数据同步到本地
+###############################################################################
 
-# 同步本地数据
-npx wrangler d1 execute vault_db --local --file=./online-dump.sql
+DB_NAME="vault"
+DUMP_FILE="./.wrangler/remote-dump.sql"
 
-# 删除临时文件
-rm -rf ./online-dump.sql
+echo ">>> 导出远程数据..."
+npx wrangler d1 export "$DB_NAME" --remote --output="$DUMP_FILE"
+
+echo ""
+echo ">>> 清理本地表..."
+npx wrangler d1 execute "$DB_NAME" --local --file="$SCRIPT_DIR/clean-local-db.sql"
+
+echo ""
+echo ">>> 同步到本地数据库..."
+npx wrangler d1 execute "$DB_NAME" --local --file="$DUMP_FILE"
+
+echo ""
+echo ">>> 清理临时文件..."
+rm -f "$DUMP_FILE"
+
+echo ""
+echo "✅ 同步完成，运行 bash script/db-inspect.sh 查看本地数据"
