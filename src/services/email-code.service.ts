@@ -6,10 +6,21 @@ import { emailVerifications } from '../db/schema';
 import { AppError } from '../utils';
 
 export class EmailCodeService {
-	private resend: Resend;
+	private resend: Resend | null = null;
 
-	constructor(private vault_db: Bindings['vault_db'], emailApiToken: string) {
-		this.resend = new Resend(emailApiToken);
+	constructor(
+		private vault_db: Bindings['vault_db'],
+		private emailApiToken: string
+	) {}
+
+	private getResend(): Resend {
+		if (!this.resend) {
+			if (!this.emailApiToken) {
+				throw new AppError('邮件服务未配置（缺少 EMAIL_API_TOKEN）', 500);
+			}
+			this.resend = new Resend(this.emailApiToken);
+		}
+		return this.resend;
 	}
 
 	async sendVerificationCode(email: string) {
@@ -68,7 +79,8 @@ export class EmailCodeService {
 		return Math.floor(100000 + Math.random() * 900000).toString();
 	}
 	private async sendEmail(email: string, code: string) {
-		await this.resend.emails.send({
+		const resend = this.getResend();
+		await resend.emails.send({
 			from: 'Vault<noreply@yoxiaya.com>',
 			to: [email],
 			subject: 'Vault 验证码',
