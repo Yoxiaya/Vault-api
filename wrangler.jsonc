@@ -1,19 +1,23 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "vault-api",
-  "main": "src/index.ts",
-  "compatibility_date": "2026-04-09",
-  "d1_databases": [
-    {
-      "binding": "vault_db",
-      "database_name": "vault",
-      "database_id": "15eee015-65c8-4375-897a-3c8ee2b5fc9e",
-      "remote": true,
-    },
-  ],
-  "vars": {
-    "IMAGE_API_URL": "https://api.superbed.cn",
-    "IMAGE_API_TOKEN": "",
-    "EMAIL_API_TOKEN": ""
-  }
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "vault-api",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-04-09",
+	"d1_databases": [
+		{
+			"binding": "vault_db",
+			"database_name": "vault",
+			"database_id": "15eee015-65c8-4375-897a-3c8ee2b5fc9e",
+			"remote": true,
+		},
+	],
+	"dev": {
+		"ip": "0.0.0.0",
+		"port": 8787,
+	},
+	"vars": {
+		"IMAGE_API_URL": "https://api.superbed.cn",
+		"IMAGE_API_TOKEN": "",
+		"EMAIL_API_TOKEN": "",
+	},
 }
