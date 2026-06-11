@@ -33,12 +33,4 @@ export class VaultAccountsService {
 	async findById(id: number): Promise<Account | null> {
 		return this.repository.findById(id);
 	}
-
-	async uploadImage(image: File): Promise<any> {
-		return await uploadImage(image, this.imageApiUrl, this.imageApiToken);
-	}
-
-	async deleteImage(url: string): Promise<any> {
-		return await deleteImage(url, this.imageApiUrl, this.imageApiToken);
-	}
 }

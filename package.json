@@ -2,9 +2,8 @@
   "name": "vault-api",
   "type": "module",
   "scripts": {
-    "dev": "bash start.sh",
-    "dev:local": "bash start.sh -m local",
-    "dev:port": "bash start.sh -p",
+    "dev": "wrangler dev --ip 0.0.0.0",
+    "dev:local": "wrangler dev --local --ip 0.0.0.0",
     "sync": "bash ./script/syncDbData.sh",
     "deploy": "wrangler deploy --minify",
     "build": "echo 'Build completed'",
