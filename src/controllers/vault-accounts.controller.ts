@@ -20,8 +20,9 @@ export class VaultAccountsController {
 		const formData = await c.req.parseBody();
 		const data = JSON.parse(formData['data'] as string);
 		const imagefile = formData['image'] as File;
+		const action = formData['action'] as string;
 		let logoUrl = '';
-		if (imagefile) {
+		if (action === 'update') {
 			const imageInfo = await this.commonService.uploadImage(imagefile);
 			logoUrl = imageInfo.url;
 		}
@@ -35,18 +36,23 @@ export class VaultAccountsController {
 		const session = c.get('session');
 		const data = JSON.parse(formData['data'] as string);
 		const imagefile = formData['image'] as File;
+		const action = formData['action'] as string;
 		const account = await this.service.findById(id);
-		let logoUrl = account?.logoUrl || '';
-		if (imagefile) {
-			if (logoUrl) {
-				await this.commonService.deleteImage(logoUrl);
-			}
+		let logoUrl = '';
+
+		if (action === 'update') {
+			await this.commonService.deleteImage(logoUrl);
 			const imageInfo = await this.commonService.uploadImage(imagefile);
 			logoUrl = imageInfo.url;
-		} else {
+		}
+		if (action === 'delete') {
 			await this.commonService.deleteImage(logoUrl);
 			logoUrl = '';
 		}
+		if (action === 'keep') {
+			logoUrl = account?.logoUrl || '';
+		}
+
 		await this.service.updateAccount(id, { ...data, userId: session.user_id, logoUrl });
 		return c.json({ success: true, message: '更新成功' }, 200);
 	}
