@@ -3,14 +3,17 @@ import { VaultAccountsController } from '../controllers/vault-accounts.controlle
 import { VaultAccountsService } from '../services/vault-accounts.service';
 import { Bindings, Variables } from '../types';
 import { authMiddleware } from '../middlewares';
+import { CommonService } from '../services/common.service';
 
 export const vaultAccountsRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 vaultAccountsRoutes.use('*', async (c, next) => {
 	const vaultAccountsService = new VaultAccountsService(c.env.vault_db, c.env.IMAGE_API_URL, c.env.IMAGE_API_TOKEN);
+	const commonService = new CommonService(c.env.IMAGE_API_URL, c.env.IMAGE_API_TOKEN);
 	const session = await authMiddleware(c.env.vault_db, c.req.header('Authorization') || '');
 	c.set('session', session);
-	c.set('vaultAccountsController', new VaultAccountsController(vaultAccountsService));
+	c.set('vaultAccountsController', new VaultAccountsController(vaultAccountsService, commonService));
+
 	await next();
 });
 
@@ -19,5 +22,3 @@ vaultAccountsRoutes.post('/', (c) => c.get('vaultAccountsController')!.createAcc
 vaultAccountsRoutes.put('/:id', (c) => c.get('vaultAccountsController')!.updateAccount(c));
 vaultAccountsRoutes.delete('/:id', (c) => c.get('vaultAccountsController')!.deleteAccount(c));
 vaultAccountsRoutes.get('/:id', (c) => c.get('vaultAccountsController')!.findById(c));
-vaultAccountsRoutes.post('/upload-image', (c) => c.get('vaultAccountsController')!.uploadImage(c));
-vaultAccountsRoutes.post('/delete-image', (c) => c.get('vaultAccountsController')!.deleteImage(c));

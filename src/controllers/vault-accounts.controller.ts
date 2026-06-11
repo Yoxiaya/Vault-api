@@ -1,9 +1,13 @@
 import { Context } from 'hono';
 import { VaultAccountsService } from '../services/vault-accounts.service';
+import { CommonService } from '../services/common.service';
 import { AppError } from '../utils';
 
 export class VaultAccountsController {
-	constructor(private service: VaultAccountsService) {}
+	constructor(
+		private service: VaultAccountsService,
+		private commonService: CommonService
+	) {}
 
 	async getAllAccounts(c: Context) {
 		const session = c.get('session');
@@ -12,17 +16,38 @@ export class VaultAccountsController {
 	}
 
 	async createAccount(c: Context) {
-		const data = await c.req.json();
 		const session = c.get('session');
-		await this.service.createAccount({ ...data, userId: session.user_id });
+		const formData = await c.req.parseBody();
+		const data = JSON.parse(formData['data'] as string);
+		const imagefile = formData['image'] as File;
+		let logoUrl = '';
+		if (imagefile) {
+			const imageInfo = await this.commonService.uploadImage(imagefile);
+			logoUrl = imageInfo.url;
+		}
+		await this.service.createAccount({ ...data, userId: session.user_id, logoUrl });
 		return c.json({ success: true, message: '创建成功' }, 201);
 	}
 
 	async updateAccount(c: Context) {
 		const id = this.parseId(c.req.param('id'));
-		const data = await c.req.json();
+		const formData = await c.req.parseBody();
 		const session = c.get('session');
-		await this.service.updateAccount(id, { ...data, userId: session.user_id });
+		const data = JSON.parse(formData['data'] as string);
+		const imagefile = formData['image'] as File;
+		const account = await this.service.findById(id);
+		let logoUrl = account?.logoUrl || '';
+		if (imagefile) {
+			if (logoUrl) {
+				await this.commonService.deleteImage(logoUrl);
+			}
+			const imageInfo = await this.commonService.uploadImage(imagefile);
+			logoUrl = imageInfo.url;
+		} else {
+			await this.commonService.deleteImage(logoUrl);
+			logoUrl = '';
+		}
+		await this.service.updateAccount(id, { ...data, userId: session.user_id, logoUrl });
 		return c.json({ success: true, message: '更新成功' }, 200);
 	}
 
@@ -39,31 +64,7 @@ export class VaultAccountsController {
 		if (!account) {
 			throw new AppError('账户不存在', 404);
 		}
-
 		return c.json({ success: true, data: account });
-	}
-
-	async uploadImage(c: Context) {
-		const data = await c.req.parseBody();
-		const image = data['file'] as File;
-
-		if (!image) {
-			throw new AppError('请提供图片文件', 400);
-		}
-
-		const result = await this.service.uploadImage(image);
-		return c.json({ success: true, data: result });
-	}
-
-	async deleteImage(c: Context) {
-		const { url } = await c.req.json();
-
-		if (!url) {
-			throw new AppError('请提供图片URL', 400);
-		}
-
-		await this.service.deleteImage(url);
-		return c.json({ success: true, message: '删除成功' });
 	}
 
 	private parseId(param: string | undefined): number {

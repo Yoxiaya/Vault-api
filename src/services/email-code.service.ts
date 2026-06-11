@@ -10,7 +10,7 @@ export class EmailCodeService {
 	private drizzleDb: ReturnType<typeof drizzle>;
 
 	constructor(
-		private vault_db: Bindings['vault_db'],
+		vault_db: Bindings['vault_db'],
 		private emailApiToken: string
 	) {
 		this.drizzleDb = drizzle(vault_db);

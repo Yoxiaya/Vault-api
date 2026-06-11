@@ -1,9 +1,9 @@
-import { Bindings, LoginInfo, RegisterUser } from '../types/index';
-import { drizzle } from 'drizzle-orm/d1';
-import { users, sessions, profiles } from '../db/schema';
-import { eq, or } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
-import { AppError } from '../utils';
+import { drizzle } from 'drizzle-orm/d1';
+import { eq, or } from 'drizzle-orm';
+import { Bindings, LoginInfo, RegisterUser } from '../types/index';
+import { users, sessions, profiles } from '../db/schema';
+import { AppError, EMAIL_REGEX } from '../utils';
 
 export class AuthRepository {
 	constructor(private vault_db: Bindings['vault_db']) {}
@@ -35,7 +35,7 @@ export class AuthRepository {
 	async login(loginInfo: LoginInfo) {
 		const drizzleDb = drizzle(this.vault_db);
 
-		const isEmail = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/.test(loginInfo.account);
+		const isEmail = EMAIL_REGEX.test(loginInfo.account);
 		let user;
 		if (isEmail) {
 			user = await drizzleDb.select().from(users).where(eq(users.email, loginInfo.account)).get();

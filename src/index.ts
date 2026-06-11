@@ -1,12 +1,10 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
-import { vaultAccountsRoutes } from './routes/vault-accounts.routes';
-import { profileRoutes } from './routes/profile.routes';
-import { Bindings, Variables } from './types/index';
-import { authRoutes } from './routes/auth.routes';
+import { Bindings, Variables } from './types';
 import { CORS_ORIGIN } from './config';
 import { onError } from './middlewares';
+import { vaultAccountsRoutes, profileRoutes, authRoutes } from './routes';
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 

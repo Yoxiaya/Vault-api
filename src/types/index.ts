@@ -26,7 +26,7 @@ export interface AuthController {
 export interface ProfileController {
 	getProfile(c: Context): Promise<Response>;
 	updateProfile(c: Context): Promise<Response>;
-	updateAvatar(c: Context): Promise<Response>;
+	uploadAvatar(c: Context): Promise<Response>;
 }
 
 export interface VaultAccountsController {
@@ -35,8 +35,6 @@ export interface VaultAccountsController {
 	updateAccount(c: Context): Promise<Response>;
 	deleteAccount(c: Context): Promise<Response>;
 	findById(c: Context): Promise<Response>;
-	uploadImage(c: Context): Promise<Response>;
-	deleteImage(c: Context): Promise<Response>;
 }
 
 export interface EmailCodeController {

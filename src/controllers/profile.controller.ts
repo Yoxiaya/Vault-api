@@ -1,9 +1,13 @@
 import { Context } from 'hono';
 import { ProfileService } from '../services/profile.service';
+import { CommonService } from '../services/common.service';
 import { Profile } from '../db/schema';
 
 export class ProfileController {
-	constructor(private service: ProfileService) {}
+	constructor(
+		private service: ProfileService,
+		private commonService: CommonService
+	) {}
 
 	async getProfile(c: Context) {
 		const session = c.get('session');
@@ -16,11 +20,16 @@ export class ProfileController {
 		await this.service.updateProfile(session.user_id, profile);
 		return c.json({ success: true, message: '更新用户信息成功' });
 	}
-	async updateAvatar(c: Context) {
+	async uploadAvatar(c: Context) {
 		const session = c.get('session');
 		const data = await c.req.parseBody();
 		const avatar = data['file'] as File;
-		await this.service.updateAvatar(session.user_id, avatar);
-		return c.json({ success: true, message: '更新用户头像成功' });
+		const profile = await this.service.getProfile(session.user_id);
+		if (profile?.profileAvatar) {
+			await this.commonService.deleteImage(profile.profileAvatar);
+		}
+		const result = await this.commonService.uploadImage(avatar);
+		await this.service.uploadAvatar(session.user_id, result.url);
+		return c.json({ success: true, message: '上传用户头像成功' });
 	}
 }

@@ -6,7 +6,6 @@ import { AppError } from '../utils';
 
 export async function authMiddleware(db: Bindings['vault_db'], authHeader: string) {
 	const drizzleDb = drizzle(db);
-	console.log(authHeader);
 	if (!authHeader || !authHeader.startsWith('Bearer ')) {
 		throw new AppError('未提供有效的 Authorization header', 401);
 	}
