@@ -13,11 +13,8 @@ export class EmailCodeService {
 		private emailApiToken: string
 	) {}
 
-	private getResend(): Resend {
-		if (!this.resend) {
-			if (!this.emailApiToken) {
-				throw new AppError('邮件服务未配置（缺少 EMAIL_API_TOKEN）', 500);
-			}
+	private getResend(): Resend | null {
+		if (!this.resend && this.emailApiToken) {
 			this.resend = new Resend(this.emailApiToken);
 		}
 		return this.resend;
@@ -80,6 +77,10 @@ export class EmailCodeService {
 	}
 	private async sendEmail(email: string, code: string) {
 		const resend = this.getResend();
+		if (!resend) {
+			console.warn('邮件服务未配置，跳过发送。验证码：', code);
+			return;
+		}
 		await resend.emails.send({
 			from: 'Vault<noreply@yoxiaya.com>',
 			to: [email],
