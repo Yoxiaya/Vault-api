@@ -1,6 +1,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "vault-api",
+	"account_id": "885094c8589f73004d04c7c0d8eac184",
 	"main": "src/index.ts",
 	"compatibility_date": "2026-04-09",
 	"d1_databases": [
@@ -17,7 +18,5 @@
 	},
 	"vars": {
 		"IMAGE_API_URL": "https://api.superbed.cn",
-		"IMAGE_API_TOKEN": "",
-		"EMAIL_API_TOKEN": "",
 	},
 }

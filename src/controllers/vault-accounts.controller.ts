@@ -22,7 +22,9 @@ export class VaultAccountsController {
 		const imagefile = formData['image'] as File;
 		const action = formData['action'] as string;
 		let logoUrl = '';
-		if (action === 'update') {
+		console.log(data, imagefile, action);
+
+		if (imagefile) {
 			const imageInfo = await this.commonService.uploadImage(imagefile);
 			logoUrl = imageInfo.url;
 		}
@@ -41,12 +43,12 @@ export class VaultAccountsController {
 		let logoUrl = '';
 
 		if (action === 'update') {
-			await this.commonService.deleteImage(logoUrl);
+			await this.commonService.deleteImage(account?.logoUrl || '');
 			const imageInfo = await this.commonService.uploadImage(imagefile);
 			logoUrl = imageInfo.url;
 		}
 		if (action === 'delete') {
-			await this.commonService.deleteImage(logoUrl);
+			await this.commonService.deleteImage(account?.logoUrl || '');
 			logoUrl = '';
 		}
 		if (action === 'keep') {
